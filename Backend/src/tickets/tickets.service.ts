@@ -10,4 +10,14 @@ export class TicketsService {
   findAll() {
     return this.tickets;
   }
+
+  create(data: any) {
+    const newTicket = {
+      id: this.tickets.length + 1,
+      ...data,
+    };
+
+    this.tickets.push(newTicket);
+    return newTicket;
+  }
 }
