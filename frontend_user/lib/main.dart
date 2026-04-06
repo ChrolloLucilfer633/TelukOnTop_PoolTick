@@ -1,46 +1,98 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MaterialApp(home: HomePage()));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class HomePage extends StatelessWidget {
 
-  Future<List> getTickets() async {
-    final res = await http.get(
-      Uri.parse("http://localhost:3000/tickets"),
+  // 🔥 ambil data tiket
+  Future<List<dynamic>> fetchTickets() async {
+    final response = await http.get(
+      Uri.parse('http://localhost:3000/tickets'),
+      // 👉 kalau emulator ganti jadi:
+      // Uri.parse('http://10.0.2.2:3000/tickets'),
     );
-    return jsonDecode(res.body);
+
+    return json.decode(response.body);
+  }
+
+  // 🔥 fungsi beli tiket (POST ke backend)
+  Future<void> beliTiket(String name, int price, BuildContext context) async {
+    await http.post(
+      Uri.parse('http://localhost:3000/transactions'),
+      // 👉 kalau emulator:
+      // Uri.parse('http://10.0.2.2:3000/transactions'),
+
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'name': name,
+        'price': price,
+      }),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Berhasil beli $name"),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text("PoolTick")),
-        body: FutureBuilder(
-          future: getTickets(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('🏊 PoolTick'),
+        centerTitle: true,
+      ),
+      body: FutureBuilder(
+        future: fetchTickets(),
+        builder: (context, snapshot) {
 
-            var data = snapshot.data as List;
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
 
-            return ListView.builder(
-              itemCount: data.length,
-              itemBuilder: (context, i) {
-                return ListTile(
-                  title: Text(data[i]['name']),
-                  subtitle: Text("Rp ${data[i]['price']}"),
-                );
-              },
-            );
-          },
-        ),
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          final data = snapshot.data as List;
+
+          return ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+
+              return Card(
+                margin: EdgeInsets.all(10),
+                child: ListTile(
+                  leading: Icon(Icons.confirmation_number),
+
+                  title: Text(
+                    data[index]['name'],
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+
+                  subtitle: Text("Harga: Rp ${data[index]['price']}"),
+
+                  trailing: ElevatedButton(
+                    child: Text("Beli"),
+                    onPressed: () {
+                      beliTiket(
+                        data[index]['name'],
+                        data[index]['price'],
+                        context,
+                      );
+                    },
+                  ),
+                ),
+              );
+
+            },
+          );
+        },
       ),
     );
   }
