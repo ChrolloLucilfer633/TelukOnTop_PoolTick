@@ -4,23 +4,44 @@
   <title>PoolTick CMS</title>
 </head>
 <body>
-  <h1>Dashboard PoolTick</h1>
+<h1>🏊 PoolTick Dashboard</h1>
 
-  <h2>Daftar Tiket</h2>
-  <ul id="list"></ul>
+<h3 id="total"></h3>
 
-  <script>
-    fetch('http://localhost:3001/tickets')
-      .then(res => res.json())
-      .then(data => {
-        const list = document.getElementById('list');
-        data.forEach(item => {
-          const li = document.createElement('li');
-          li.innerText = item.name + " - Rp " + item.price;
-          list.appendChild(li);
-        });
-      })
-      .catch(err => console.log(err));
-  </script>
+<table border="1">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nama</th>
+      <th>Harga</th>
+    </tr>
+  </thead>
+  <tbody id="data"></tbody>
+</table>
+
+<script>
+fetch('http://localhost:3000/tickets')
+  .then(res => res.json())
+  .then(data => {
+    const table = document.getElementById('data');
+    const total = document.getElementById('total');
+
+    let sum = 0;
+
+    data.forEach(item => {
+      sum += item.price;
+
+      table.innerHTML += `
+        <tr>
+          <td>${item.id}</td>
+          <td>${item.name}</td>
+          <td>${item.price}</td>
+        </tr>
+      `;
+    });
+
+    total.innerText = "Total Pendapatan: Rp " + sum;
+  });
+</script>
 </body>
 </html>
