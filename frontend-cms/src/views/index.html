@@ -8,6 +8,12 @@
 
 <h3 id="total"></h3>
 
+<h2>Tambah Tiket</h2>
+
+<input type="text" id="name" placeholder="Nama tiket">
+<input type="number" id="price" placeholder="Harga">
+<button onclick="tambahTiket()">Tambah</button>
+
 <table border="1">
   <thead>
     <tr>
@@ -42,6 +48,28 @@ fetch('http://localhost:3000/tickets')
 
     total.innerText = "Total Pendapatan: Rp " + sum;
   });
+  
+  function tambahTiket() {
+  const name = document.getElementById('name').value;
+  const price = document.getElementById('price').value;
+
+  fetch('http://localhost:3000/tickets', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: name,
+      price: parseInt(price)
+    })
+  })
+  .then(res => res.json())
+  .then(() => {
+    alert("Tiket berhasil ditambah!");
+    location.reload(); // refresh biar update tabel
+  })
+  .catch(err => console.error(err));
+}
 </script>
 </body>
 </html>
