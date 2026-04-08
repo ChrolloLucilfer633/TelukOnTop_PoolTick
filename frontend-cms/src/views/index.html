@@ -4,6 +4,14 @@
   <title>PoolTick CMS</title>
 </head>
 <body>
+<div id="login">
+  <h2>Login Admin</h2>
+  <input type="text" id="username" placeholder="Username">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+</div>
+
+<div id="dashboard" style="display:none;">
 
 <h1>🏊 PoolTick Dashboard</h1>
 
@@ -46,56 +54,75 @@
 </table>
 
 <script>
+// login cms
+function login() {
+  const user = document.getElementById('username').value;
+  const pass = document.getElementById('password').value;
 
-// 🔥 FETCH TICKETS
-fetch('http://localhost:3000/tickets')
-  .then(res => res.json())
-  .then(data => {
-    const table = document.getElementById('data');
+  // 🔥 login simple (hardcode dulu)
+  if (user === "1" && pass === "1") {
+    document.getElementById('login').style.display = "none";
+    document.getElementById('dashboard').style.display = "block";
+  } else {
+    alert("Login gagal!");
+  }
+}
 
-    data.forEach(item => {
-      table.innerHTML += `
-        <tr>
-          <td>${item.id}</td>
-          <td>${item.name}</td>
-          <td>${item.price}</td>
-          <td>
-            <button onclick="beliTiket('${item.name}', ${item.price})">Beli</button>
-            <button onclick="hapusTiket(${item.id})">Hapus</button>
-          </td>
-        </tr>
-      `;
-    });
-  });
+// 🔥 LOAD SEMUA DATA (BIAR GA DUPLIKAT)
+function loadData() {
 
+  // RESET TABLE BIAR GA NUMPUK
+  document.getElementById('data').innerHTML = "";
+  document.getElementById('transaksi').innerHTML = "";
 
-// 🔥 FETCH TRANSAKSI
-fetch('http://localhost:3000/transactions')
-  .then(res => res.json())
-  .then(data => {
-    const table = document.getElementById('transaksi');
-    const total = document.getElementById('total');
+  // 🔥 FETCH TICKETS
+  fetch('http://localhost:3000/tickets')
+    .then(res => res.json())
+    .then(data => {
+      const table = document.getElementById('data');
 
-    let totalTransaksi = 0;
-
-    data.forEach(item => {
-      totalTransaksi += item.price;
-
-      table.innerHTML += `
-        <tr>
-          <td>${item.id}</td>
-          <td>${item.name}</td>
-          <td>${item.price}</td>
-          <td>
-            <button onclick="hapusTransaksi(${item.id})">Hapus</button>
-          </td>
-        </tr>
-      `;
+      data.forEach(item => {
+        table.innerHTML += `
+          <tr>
+            <td>${item.id}</td>
+            <td>${item.name}</td>
+            <td>${item.price}</td>
+            <td>
+              <button onclick="beliTiket('${item.name}', ${item.price})">Beli</button>
+              <button onclick="hapusTiket(${item.id})">Hapus</button>
+            </td>
+          </tr>
+        `;
+      });
     });
 
-    total.innerText = "Total Pendapatan: Rp " + totalTransaksi;
-  });
+  // 🔥 FETCH TRANSAKSI
+  fetch('http://localhost:3000/transactions')
+    .then(res => res.json())
+    .then(data => {
+      const table = document.getElementById('transaksi');
+      const total = document.getElementById('total');
 
+      let totalTransaksi = 0;
+
+      data.forEach(item => {
+        totalTransaksi += item.price;
+
+        table.innerHTML += `
+          <tr>
+            <td>${item.id}</td>
+            <td>${item.name}</td>
+            <td>${item.price}</td>
+            <td>
+              <button onclick="hapusTransaksi(${item.id})">Hapus</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      total.innerText = "Total Pendapatan: Rp " + totalTransaksi;
+    });
+}
 
 // 🔥 TAMBAH TIKET
 function tambahTiket() {
@@ -114,12 +141,11 @@ function tambahTiket() {
   })
   .then(() => {
     alert("Tiket berhasil ditambah!");
-    location.reload();
+    loadData(); // ❌ ga reload lagi
   });
 }
 
-
-// 🔥 BELI TIKET → MASUK TRANSAKSI
+// 🔥 BELI TIKET
 function beliTiket(nama, harga) {
   fetch('http://localhost:3000/transactions', {
     method: 'POST',
@@ -133,10 +159,9 @@ function beliTiket(nama, harga) {
   })
   .then(() => {
     alert("Berhasil beli tiket!");
-    location.reload();
+    loadData();
   });
 }
-
 
 // 🔥 HAPUS TIKET
 function hapusTiket(id) {
@@ -145,10 +170,9 @@ function hapusTiket(id) {
   })
   .then(() => {
     alert("Tiket dihapus!");
-    location.reload();
+    loadData();
   });
 }
-
 
 // 🔥 HAPUS TRANSAKSI
 function hapusTransaksi(id) {
@@ -157,11 +181,14 @@ function hapusTransaksi(id) {
   })
   .then(() => {
     alert("Transaksi dihapus!");
-    location.reload();
+    loadData();
   });
 }
 
-</script>
+// 🔥 LOAD AWAL
+loadData();
 
+</script>
+</div>
 </body>
 </html>
