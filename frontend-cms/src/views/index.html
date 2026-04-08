@@ -70,7 +70,11 @@ fetch('http://localhost:3000/transactions')
   .then(data => {
     const table = document.getElementById('transaksi');
 
+    let totalTransaksi = 0;
+
     data.forEach(item => {
+      totalTransaksi += item.price;
+
       table.innerHTML += `
         <tr>
           <td>${item.id}</td>
@@ -79,6 +83,10 @@ fetch('http://localhost:3000/transactions')
         </tr>
       `;
     });
+
+    // 🔥 tampilkan total dari transaksi
+    const total = document.getElementById('total');
+    total.innerText = "Total Pendapatan (Real): Rp " + totalTransaksi;
   });
 
 
