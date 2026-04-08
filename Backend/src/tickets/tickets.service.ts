@@ -20,4 +20,10 @@ export class TicketsService {
     this.tickets.push(newTicket);
     return newTicket;
   }
+
+  // 🔥 DELETE TIKET
+  delete(id: number) {
+    this.tickets = this.tickets.filter(t => t.id !== id);
+    return { message: 'Deleted' };
+  }
 }
