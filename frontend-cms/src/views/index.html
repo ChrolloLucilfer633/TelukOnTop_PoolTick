@@ -12,7 +12,20 @@
 
 <input type="text" id="name" placeholder="Nama tiket">
 <input type="number" id="price" placeholder="Harga">
-<button onclick="tambahTiket()">Tambah</button>
+<button onclick="tambahTiket()">Tambah</button><br>
+
+<h2>Riwayat Transaksi</h2>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nama Tiket</th>
+      <th>Harga</th>
+    </tr>
+  </thead>
+  <tbody id="transaksi"></tbody>
+</table><br>
 
 <table border="1">
   <thead>
@@ -69,6 +82,22 @@ fetch('http://localhost:3000/tickets')
     location.reload(); // refresh biar update tabel
   })
   .catch(err => console.error(err));
+
+  fetch('http://localhost:3000/transactions')
+  .then(res => res.json())
+  .then(data => {
+    const table = document.getElementById('transaksi');
+
+    data.forEach(item => {
+      table.innerHTML += `
+        <tr>
+          <td>${item.id}</td>
+          <td>${item.name}</td>
+          <td>${item.price}</td>
+        </tr>
+      `;
+    });
+  });
 }
 </script>
 </body>
