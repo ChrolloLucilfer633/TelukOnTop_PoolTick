@@ -22,7 +22,9 @@ export class TransactionsService {
 
   // 🔥 DELETE
   delete(id: number) {
-    this.transactions = this.transactions.filter(t => t.id !== id);
-    return { message: 'Deleted' };
-  }
+  this.transactions = this.transactions.filter(
+    t => t.id !== Number(id) // 🔥 wajib Number
+  );
+  return { message: 'Deleted' };
+}
 }
