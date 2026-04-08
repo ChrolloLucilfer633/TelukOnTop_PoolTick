@@ -7,10 +7,12 @@ export class TicketsService {
     { id: 2, name: 'Tiket Anak', price: 10000 },
   ];
 
+  // 🔥 GET ALL
   findAll() {
     return this.tickets;
   }
 
+  // 🔥 CREATE
   create(data: any) {
     const newTicket = {
       id: this.tickets.length + 1,
@@ -21,7 +23,7 @@ export class TicketsService {
     return newTicket;
   }
 
-  // 🔥 DELETE TIKET
+  // 🔥 DELETE
   delete(id: number) {
     this.tickets = this.tickets.filter(t => t.id !== id);
     return { message: 'Deleted' };
