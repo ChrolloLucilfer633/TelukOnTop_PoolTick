@@ -21,10 +21,15 @@ export class TransactionsService {
   }
 
   // 🔥 DELETE
-  delete(id: number) {
+ delete(id: number) {
+  console.log("DELETE ID:", id);
+
   this.transactions = this.transactions.filter(
-    t => t.id !== Number(id) // 🔥 wajib Number
+    t => t.id !== Number(id)
   );
+
+  console.log("DATA SEKARANG:", this.transactions);
+
   return { message: 'Deleted' };
 }
 }
