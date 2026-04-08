@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 export class TransactionsService {
   private transactions: any[] = [];
 
+  // 🔥 CREATE
   create(data: any) {
     const newData = {
       id: this.transactions.length + 1,
@@ -14,7 +15,14 @@ export class TransactionsService {
     return newData;
   }
 
+  // 🔥 GET ALL
   findAll() {
     return this.transactions;
+  }
+
+  // 🔥 DELETE
+  delete(id: number) {
+    this.transactions = this.transactions.filter(t => t.id !== id);
+    return { message: 'Deleted' };
   }
 }
