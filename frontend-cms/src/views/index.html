@@ -31,6 +31,7 @@
       <th>ID</th>
       <th>Nama Tiket</th>
       <th>Harga</th>
+      <th>Aksi</th>
     </tr>
   </thead>
   <tbody id="transaksi"></tbody>
@@ -102,6 +103,9 @@ fetch('http://localhost:3000/transactions')
           <td>${item.id}</td>
           <td>${item.name}</td>
           <td>${item.price}</td>
+          <td>
+            <button onclick="hapusTransaksi(${item.id})">Hapus</button>
+          </td>
         </tr>
       `;
     });
@@ -139,6 +143,17 @@ function hapusTiket(id) {
   })
   .then(() => {
     alert("Tiket dihapus!");
+    location.reload();
+  });
+}
+
+// Hapus Transaksi
+function hapusTransaksi(id) {
+  fetch(`http://localhost:3000/transactions/${id}`, {
+    method: 'DELETE'
+  })
+  .then(() => {
+    alert("Transaksi dihapus!");
     location.reload();
   });
 }
