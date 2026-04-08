@@ -39,6 +39,7 @@
 </table>
 
 <script>
+// 🔥 FETCH TICKETS
 fetch('http://localhost:3000/tickets')
   .then(res => res.json())
   .then(data => {
@@ -61,8 +62,28 @@ fetch('http://localhost:3000/tickets')
 
     total.innerText = "Total Pendapatan: Rp " + sum;
   });
-  
-  function tambahTiket() {
+
+
+// 🔥 FETCH TRANSAKSI (PINDAH KE SINI!)
+fetch('http://localhost:3000/transactions')
+  .then(res => res.json())
+  .then(data => {
+    const table = document.getElementById('transaksi');
+
+    data.forEach(item => {
+      table.innerHTML += `
+        <tr>
+          <td>${item.id}</td>
+          <td>${item.name}</td>
+          <td>${item.price}</td>
+        </tr>
+      `;
+    });
+  });
+
+
+// 🔥 TAMBAH TIKET
+function tambahTiket() {
   const name = document.getElementById('name').value;
   const price = document.getElementById('price').value;
 
@@ -79,25 +100,9 @@ fetch('http://localhost:3000/tickets')
   .then(res => res.json())
   .then(() => {
     alert("Tiket berhasil ditambah!");
-    location.reload(); // refresh biar update tabel
+    location.reload();
   })
   .catch(err => console.error(err));
-
-  fetch('http://localhost:3000/transactions')
-  .then(res => res.json())
-  .then(data => {
-    const table = document.getElementById('transaksi');
-
-    data.forEach(item => {
-      table.innerHTML += `
-        <tr>
-          <td>${item.id}</td>
-          <td>${item.name}</td>
-          <td>${item.price}</td>
-        </tr>
-      `;
-    });
-  });
 }
 </script>
 </body>
