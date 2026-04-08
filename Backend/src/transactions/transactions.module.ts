@@ -1,6 +1,4 @@
-import { Module } from '@nestjs/common';
-import { Controller, Post, Body, Get } from '@nestjs/common';
-import { Injectable } from '@nestjs/common';
+import { Module, Controller, Post, Body, Get, Delete, Param, Injectable } from '@nestjs/common';
 
 @Injectable()
 class TransactionsService {
@@ -19,6 +17,14 @@ class TransactionsService {
   findAll() {
     return this.transactions;
   }
+
+  // 🔥 TAMBAH INI
+  delete(id: number) {
+    this.transactions = this.transactions.filter(
+      t => t.id !== Number(id)
+    );
+    return { message: 'Deleted' };
+  }
 }
 
 @Controller('transactions')
@@ -33,6 +39,12 @@ class TransactionsController {
   @Get()
   findAll() {
     return this.service.findAll();
+  }
+
+  // 🔥 DELETE ENDPOINT
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.service.delete(Number(id));
   }
 }
 
