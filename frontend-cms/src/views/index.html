@@ -42,6 +42,7 @@
       <th>ID</th>
       <th>Nama</th>
       <th>Harga</th>
+      <th>Aksi</th>
     </tr>
   </thead>
   <tbody id="data"></tbody>
@@ -63,35 +64,33 @@
 // }
 
 // 🔥 FETCH TICKETS
+// 🔥 FETCH TICKETS
 fetch('http://localhost:3000/tickets')
   .then(res => res.json())
   .then(data => {
     const table = document.getElementById('data');
-    const total = document.getElementById('total');
-
-    let sum = 0;
 
     data.forEach(item => {
-      sum += item.price;
-
       table.innerHTML += `
         <tr>
           <td>${item.id}</td>
           <td>${item.name}</td>
           <td>${item.price}</td>
+          <td>
+            <button onclick="hapusTiket(${item.id})">Hapus</button>
+          </td>
         </tr>
       `;
     });
-
-    total.innerText = "Total Pendapatan: Rp " + sum;
   });
 
 
-// 🔥 FETCH TRANSAKSI (PINDAH KE SINI!)
+// 🔥 FETCH TRANSAKSI
 fetch('http://localhost:3000/transactions')
   .then(res => res.json())
   .then(data => {
     const table = document.getElementById('transaksi');
+    const total = document.getElementById('total');
 
     let totalTransaksi = 0;
 
@@ -107,9 +106,7 @@ fetch('http://localhost:3000/transactions')
       `;
     });
 
-    // 🔥 tampilkan total dari transaksi
-    const total = document.getElementById('total');
-    total.innerText = "Total Pendapatan (Real): Rp " + totalTransaksi;
+    total.innerText = "Total Pendapatan: Rp " + totalTransaksi;
   });
 
 
@@ -128,12 +125,22 @@ function tambahTiket() {
       price: parseInt(price)
     })
   })
-  .then(res => res.json())
   .then(() => {
     alert("Tiket berhasil ditambah!");
     location.reload();
+  });
+}
+
+
+// 🔥 HAPUS TIKET
+function hapusTiket(id) {
+  fetch(`http://localhost:3000/tickets/${id}`, {
+    method: 'DELETE'
   })
-  .catch(err => console.error(err));
+  .then(() => {
+    alert("Tiket dihapus!");
+    location.reload();
+  });
 }
 </script>
 </div>
