@@ -4,14 +4,6 @@
   <title>PoolTick CMS</title>
 </head>
 <body>
-<!-- <div id="login">
-  <h2>Login Admin</h2>
-  <input type="text" id="username" placeholder="Username">
-  <input type="password" id="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-</div>
-
-<div id="dashboard" style="display:none;"> -->
 
 <h1>🏊 PoolTick Dashboard</h1>
 
@@ -21,7 +13,7 @@
 
 <input type="text" id="name" placeholder="Nama tiket">
 <input type="number" id="price" placeholder="Harga">
-<button onclick="tambahTiket()">Tambah</button><br>
+<button onclick="tambahTiket()">Tambah</button><br><br>
 
 <h2>Riwayat Transaksi</h2>
 
@@ -35,7 +27,11 @@
     </tr>
   </thead>
   <tbody id="transaksi"></tbody>
-</table><br>
+</table>
+
+<br>
+
+<h2>Daftar Tiket</h2>
 
 <table border="1">
   <thead>
@@ -50,21 +46,7 @@
 </table>
 
 <script>
-// // login cms
-// function login() {
-//   const user = document.getElementById('username').value;
-//   const pass = document.getElementById('password').value;
 
-//   // 🔥 login simple (hardcode dulu)
-//   if (user === "1" && pass === "1") {
-//     document.getElementById('login').style.display = "none";
-//     document.getElementById('dashboard').style.display = "block";
-//   } else {
-//     alert("Login gagal!");
-//   }
-// }
-
-// 🔥 FETCH TICKETS
 // 🔥 FETCH TICKETS
 fetch('http://localhost:3000/tickets')
   .then(res => res.json())
@@ -78,6 +60,7 @@ fetch('http://localhost:3000/tickets')
           <td>${item.name}</td>
           <td>${item.price}</td>
           <td>
+            <button onclick="beliTiket('${item.name}', ${item.price})">Beli</button>
             <button onclick="hapusTiket(${item.id})">Hapus</button>
           </td>
         </tr>
@@ -136,6 +119,25 @@ function tambahTiket() {
 }
 
 
+// 🔥 BELI TIKET → MASUK TRANSAKSI
+function beliTiket(nama, harga) {
+  fetch('http://localhost:3000/transactions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: nama,
+      price: harga
+    })
+  })
+  .then(() => {
+    alert("Berhasil beli tiket!");
+    location.reload();
+  });
+}
+
+
 // 🔥 HAPUS TIKET
 function hapusTiket(id) {
   fetch(`http://localhost:3000/tickets/${id}`, {
@@ -147,7 +149,8 @@ function hapusTiket(id) {
   });
 }
 
-// Hapus Transaksi
+
+// 🔥 HAPUS TRANSAKSI
 function hapusTransaksi(id) {
   fetch(`http://localhost:3000/transactions/${id}`, {
     method: 'DELETE'
@@ -157,7 +160,8 @@ function hapusTransaksi(id) {
     location.reload();
   });
 }
+
 </script>
-</div>
+
 </body>
 </html>
