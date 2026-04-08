@@ -68,10 +68,9 @@ function login() {
   }
 }
 
-// 🔥 LOAD SEMUA DATA (BIAR GA DUPLIKAT)
+// 🔥 LOAD SEMUA DATA
 function loadData() {
 
-  // RESET TABLE BIAR GA NUMPUK
   document.getElementById('data').innerHTML = "";
   document.getElementById('transaksi').innerHTML = "";
 
@@ -139,10 +138,12 @@ function tambahTiket() {
       price: parseInt(price)
     })
   })
+  .then(res => res.json())
   .then(() => {
     alert("Tiket berhasil ditambah!");
-    loadData(); // ❌ ga reload lagi
-  });
+    loadData();
+  })
+  .catch(err => console.error("ERROR TAMBAH:", err));
 }
 
 // 🔥 BELI TIKET
@@ -157,32 +158,44 @@ function beliTiket(nama, harga) {
       price: harga
     })
   })
+  .then(res => res.json())
   .then(() => {
     alert("Berhasil beli tiket!");
     loadData();
-  });
+  })
+  .catch(err => console.error("ERROR BELI:", err));
 }
 
 // 🔥 HAPUS TIKET
 function hapusTiket(id) {
+  console.log("HAPUS TIKET ID:", id);
+
   fetch(`http://localhost:3000/tickets/${id}`, {
     method: 'DELETE'
   })
-  .then(() => {
+  .then(res => res.json())
+  .then(res => {
+    console.log("RESPON TIKET:", res);
     alert("Tiket dihapus!");
     loadData();
-  });
+  })
+  .catch(err => console.error("ERROR HAPUS TIKET:", err));
 }
 
-// 🔥 HAPUS TRANSAKSI
+// 🔥 HAPUS TRANSAKSI (INI YANG KITA TRACK)
 function hapusTransaksi(id) {
+  console.log("HAPUS TRANSAKSI ID:", id);
+
   fetch(`http://localhost:3000/transactions/${id}`, {
     method: 'DELETE'
   })
-  .then(() => {
+  .then(res => res.json())
+  .then(res => {
+    console.log("RESPON TRANSAKSI:", res);
     alert("Transaksi dihapus!");
     loadData();
-  });
+  })
+  .catch(err => console.error("ERROR HAPUS TRANSAKSI:", err));
 }
 
 // 🔥 LOAD AWAL
