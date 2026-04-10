@@ -13,6 +13,6 @@ export class Transaction {
   price: number;
 
   // 🔥 RELASI (optional biar ga error 500)
-  @ManyToOne(() => Ticket, { nullable: true })
+  @ManyToOne(() => Ticket)
   ticket: Ticket;
 }
