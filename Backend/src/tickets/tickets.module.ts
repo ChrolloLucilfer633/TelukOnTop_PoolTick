@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Ticket } from './tickets.entity';
 import { TicketsController } from './tickets.controller';
 import { TicketsService } from './tickets.service';
+import { PrismaModule } from '../prisma/prisma.module'; // 🔥 TAMBAH INI
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Ticket])], // 🔥 DI SINI TEMPATNYA
+  imports: [PrismaModule], // 🔥 WAJIB
   controllers: [TicketsController],
   providers: [TicketsService],
 })

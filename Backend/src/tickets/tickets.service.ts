@@ -1,31 +1,31 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TicketsService {
-  private tickets = [
-    { id: 1, name: 'Tiket Dewasa', price: 20000 },
-    { id: 2, name: 'Tiket Anak', price: 10000 },
-  ];
+  constructor(private prisma: PrismaService) {}
 
   // 🔥 GET ALL
-  findAll() {
-    return this.tickets;
+  async findAll() {
+    return await this.prisma.ticket.findMany();
   }
 
   // 🔥 CREATE
-  create(data: any) {
-    const newTicket = {
-      id: this.tickets.length + 1,
-      ...data,
-    };
-
-    this.tickets.push(newTicket);
-    return newTicket;
+  async create(data: any) {
+    return await this.prisma.ticket.create({
+      data: {
+        name: data.name,
+        price: Number(data.price),
+      },
+    });
   }
 
   // 🔥 DELETE
-  delete(id: number) {
-    this.tickets = this.tickets.filter(t => t.id !== id);
-    return { message: 'Deleted' };
+  async delete(id: number) {
+    return await this.prisma.ticket.delete({
+      where: {
+        id: Number(id),
+      },
+    });
   }
 }

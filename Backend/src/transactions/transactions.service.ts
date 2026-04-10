@@ -1,31 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Transaction } from './transactions.entity';
-import { Ticket } from '../tickets/tickets.entity';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TransactionsService {
-  constructor(
-    @InjectRepository(Transaction)
-    private repo: Repository<Transaction>,
+  constructor(private prisma: PrismaService) {}
 
-    @InjectRepository(Ticket)
-    private ticketRepo: Repository<Ticket>,
-  ) {}
-
+  // 🔥 GET ALL TRANSAKSI + JOIN TICKET
   findAll() {
-    return this.repo.find({
-      relations: ['ticket'],
+    return this.prisma.transaction.findMany({
+      include: {
+        ticket: true,
+      },
     });
   }
 
+  // 🔥 CREATE TRANSAKSI
   async create(data: any) {
     console.log("DATA MASUK:", data);
 
     const ticketId = Number(data.ticketId);
 
-    const ticket = await this.ticketRepo.findOne({
+    const ticket = await this.prisma.ticket.findUnique({
       where: { id: ticketId },
     });
 
@@ -36,16 +31,19 @@ export class TransactionsService {
       return { message: 'Ticket tidak ditemukan' };
     }
 
-    const transaksi = this.repo.create({
-      name: ticket.name,
-      price: ticket.price,
-      ticket: ticket,
+    return this.prisma.transaction.create({
+      data: {
+        name: ticket.name,
+        price: ticket.price,
+        ticketId: ticket.id, // 🔥 relasi pakai ini
+      },
     });
-
-    return this.repo.save(transaksi);
   }
 
+  // 🔥 DELETE
   delete(id: number) {
-    return this.repo.delete(id);
+    return this.prisma.transaction.delete({
+      where: { id: Number(id) },
+    });
   }
 }
