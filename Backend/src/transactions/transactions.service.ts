@@ -16,23 +16,29 @@ export class TransactionsService {
 
   findAll() {
     return this.repo.find({
-      relations: ['ticket'], // 🔥 join otomatis
+      relations: ['ticket'],
     });
   }
 
   async create(data: any) {
+    console.log("DATA MASUK:", data);
+
+    const ticketId = Number(data.ticketId);
+
     const ticket = await this.ticketRepo.findOne({
-      where: { id: data.ticketId },
+      where: { id: ticketId },
     });
 
-    // 🔥 FIX: jangan throw error mentah (bikin 500)
+    console.log("CARI ID:", ticketId);
+    console.log("TICKET KETEMU:", ticket);
+
     if (!ticket) {
       return { message: 'Ticket tidak ditemukan' };
     }
 
     const transaksi = this.repo.create({
-      name: data.name,
-      price: data.price,
+      name: ticket.name,
+      price: ticket.price,
       ticket: ticket,
     });
 

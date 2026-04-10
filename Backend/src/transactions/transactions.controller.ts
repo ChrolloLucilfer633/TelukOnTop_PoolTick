@@ -1,5 +1,4 @@
 import { Controller, Post, Body, Get, Delete, Param } from '@nestjs/common';
-import { Controller, Post, Body, Get, Delete, Param } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 
 @Controller('transactions')
@@ -8,7 +7,7 @@ export class TransactionsController {
 
   @Post()
   async create(@Body() body: any) {
-    return await this.service.create(body); // 🔥 WAJIB await
+    return await this.service.create(body);
   }
 
   @Get()

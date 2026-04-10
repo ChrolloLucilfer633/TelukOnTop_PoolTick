@@ -148,21 +148,27 @@ function tambahTiket() {
 
 // 🔥 BELI TIKET
 function beliTiket(id, nama, harga) {
+  console.log("ID DIKIRIM:", id);
+
   fetch('http://localhost:3000/transactions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      name: nama,
-      price: harga,
       ticketId: id
     })
   })
   .then(res => res.json())
   .then(res => {
-    console.log("RESP:", res); // 🔥 liat error di sini
-    alert("Berhasil beli tiket!");
+    console.log("RESP:", res);
+
+    if (res.message) {
+      alert(res.message);
+    } else {
+      alert("Berhasil beli tiket!");
+    }
+
     loadData();
   })
   .catch(err => console.error(err));
