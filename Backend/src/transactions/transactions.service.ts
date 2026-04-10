@@ -25,9 +25,9 @@ export class TransactionsService {
       where: { id: data.ticketId },
     });
 
-    // 🔥 biar ga error 500
+    // 🔥 FIX: jangan throw error mentah (bikin 500)
     if (!ticket) {
-      throw new Error('Ticket tidak ditemukan');
+      return { message: 'Ticket tidak ditemukan' };
     }
 
     const transaksi = this.repo.create({

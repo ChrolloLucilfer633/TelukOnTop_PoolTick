@@ -135,7 +135,7 @@ function tambahTiket() {
     },
     body: JSON.stringify({
       name: name,
-      price: parseInt(price)
+      price: parseInt(price),
     })
   })
   .then(res => res.json())
@@ -159,10 +159,13 @@ function beliTiket(id, nama, harga) {
       ticketId: id
     })
   })
-  .then(() => {
+  .then(res => res.json())
+  .then(res => {
+    console.log("RESP:", res); // 🔥 liat error di sini
     alert("Berhasil beli tiket!");
     loadData();
-  });
+  })
+  .catch(err => console.error(err));
 }
 
 // 🔥 HAPUS TIKET
