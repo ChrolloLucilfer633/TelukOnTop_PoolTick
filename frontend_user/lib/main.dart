@@ -12,32 +12,34 @@ class HomePage extends StatelessWidget {
   Future<List<dynamic>> fetchTickets() async {
     final response = await http.get(
       Uri.parse('http://localhost:3000/tickets'),
-      // 👉 kalau emulator ganti jadi:
-      // Uri.parse('http://10.0.2.2:3000/tickets'),
     );
 
     return json.decode(response.body);
   }
 
-  // 🔥 fungsi beli tiket (POST ke backend)
-  Future<void> beliTiket(String name, int price, BuildContext context) async {
-    await http.post(
+  // 🔥 fungsi beli tiket (FIX)
+  Future<void> beliTiket(Map ticket, BuildContext context) async {
+    final response = await http.post(
       Uri.parse('http://localhost:3000/transactions'),
-      // 👉 kalau emulator:
-      // Uri.parse('http://10.0.2.2:3000/transactions'),
-
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'name': name,
-        'price': price,
+        'ticketId': ticket['id'], // ✅ WAJIB
       }),
     );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Berhasil beli $name"),
-      ),
-    );
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Berhasil beli ${ticket['name']}"),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal beli tiket"),
+        ),
+      );
+    }
   }
 
   @override
@@ -81,8 +83,7 @@ class HomePage extends StatelessWidget {
                     child: Text("Beli"),
                     onPressed: () {
                       beliTiket(
-                        data[index]['name'],
-                        data[index]['price'],
+                        data[index], // ✅ kirim full object
                         context,
                       );
                     },
