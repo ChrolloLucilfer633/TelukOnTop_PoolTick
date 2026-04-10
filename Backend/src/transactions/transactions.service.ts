@@ -11,32 +11,33 @@ export class TransactionsService {
     private repo: Repository<Transaction>,
 
     @InjectRepository(Ticket)
-    private ticketRepo: Repository<Ticket>, // 🔥 ambil ticket juga
+    private ticketRepo: Repository<Ticket>,
   ) {}
 
   findAll() {
     return this.repo.find({
-      relations: ['ticket'], // 🔥 biar join otomatis
+      relations: ['ticket'], // 🔥 join otomatis
     });
   }
 
   async create(data: any) {
-  const ticket = await this.ticketRepo.findOne({
-    where: { id: data.ticketId },
-  });
+    const ticket = await this.ticketRepo.findOne({
+      where: { id: data.ticketId },
+    });
 
-  if (!ticket) {
-    throw new Error('Ticket tidak ditemukan');
+    // 🔥 biar ga error 500
+    if (!ticket) {
+      throw new Error('Ticket tidak ditemukan');
+    }
+
+    const transaksi = this.repo.create({
+      name: data.name,
+      price: data.price,
+      ticket: ticket,
+    });
+
+    return this.repo.save(transaksi);
   }
-
-  const transaksi = this.repo.create({
-    name: data.name,
-    price: data.price,
-    ticket: ticket,
-  });
-
-  return this.repo.save(transaksi);
-}
 
   delete(id: number) {
     return this.repo.delete(id);

@@ -12,7 +12,7 @@ export class Transaction {
   @Column()
   price: number;
 
-  // 🔥 RELASI KE TICKET
-  @ManyToOne(() => Ticket)
+  // 🔥 RELASI (optional biar ga error 500)
+  @ManyToOne(() => Ticket, { nullable: true })
   ticket: Ticket;
 }
