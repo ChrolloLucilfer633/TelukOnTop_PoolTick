@@ -84,10 +84,10 @@ function loadData() {
         table.innerHTML += `
           <tr>
             <td>${item.id}</td>
-            <td>${item.name}</td>
+            <td>${item.ticket?.name || item.name}</td>
             <td>${item.price}</td>
             <td>
-              <button onclick="beliTiket('${item.name}', ${item.price})">Beli</button>
+              <button onclick="beliTiket(${item.id}, '${item.name}', ${item.price})">Beli</button>
               <button onclick="hapusTiket(${item.id})">Hapus</button>
             </td>
           </tr>
@@ -110,7 +110,7 @@ function loadData() {
         table.innerHTML += `
           <tr>
             <td>${item.id}</td>
-            <td>${item.name}</td>
+            <td>${item.ticket?.name || item.name}</td>
             <td>${item.price}</td>
             <td>
               <button onclick="hapusTransaksi(${item.id})">Hapus</button>
@@ -147,7 +147,7 @@ function tambahTiket() {
 }
 
 // 🔥 BELI TIKET
-function beliTiket(nama, harga) {
+function beliTiket(id, nama, harga) {
   fetch('http://localhost:3000/transactions', {
     method: 'POST',
     headers: {
@@ -155,15 +155,14 @@ function beliTiket(nama, harga) {
     },
     body: JSON.stringify({
       name: nama,
-      price: harga
+      price: harga,
+      ticketId: id
     })
   })
-  .then(res => res.json())
   .then(() => {
     alert("Berhasil beli tiket!");
     loadData();
-  })
-  .catch(err => console.error("ERROR BELI:", err));
+  });
 }
 
 // 🔥 HAPUS TIKET
