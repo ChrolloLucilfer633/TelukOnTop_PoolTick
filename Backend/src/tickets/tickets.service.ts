@@ -10,12 +10,34 @@ export class TicketsService {
     return await this.prisma.ticket.findMany();
   }
 
+  // 🔥 GET BY ID
+  async findOne(id: number) {
+    return await this.prisma.ticket.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+  }
+
   // 🔥 CREATE
   async create(data: any) {
     return await this.prisma.ticket.create({
       data: {
         name: data.name,
         price: Number(data.price),
+      },
+    });
+  }
+
+  // 🔥 PATCH (GANTI UPDATE)
+  async patch(id: number, data: any) {
+    return await this.prisma.ticket.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        ...(data.name && { name: data.name }),
+        ...(data.price && { price: Number(data.price) }),
       },
     });
   }
