@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TicketsController } from './tickets.controller';
 import { TicketsService } from './tickets.service';
-import { PrismaModule } from '../prisma/prisma.module'; // 🔥 TAMBAH INI
+import { PrismaModule } from '../prisma/prisma.module'; 
 
 @Module({
   imports: [PrismaModule], // 🔥 WAJIB

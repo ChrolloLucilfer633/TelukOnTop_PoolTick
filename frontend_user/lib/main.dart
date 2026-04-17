@@ -8,7 +8,7 @@ void main() {
 
 class HomePage extends StatelessWidget {
 
-  // 🔥 ambil data tiket
+  // ambil data tiket
   Future<List<dynamic>> fetchTickets() async {
     final response = await http.get(
       Uri.parse('http://localhost:3000/tickets'),
@@ -17,13 +17,13 @@ class HomePage extends StatelessWidget {
     return json.decode(response.body);
   }
 
-  // 🔥 fungsi beli tiket (FIX)
+  // fungsi beli tiket 
   Future<void> beliTiket(Map ticket, BuildContext context) async {
     final response = await http.post(
       Uri.parse('http://localhost:3000/transactions'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'ticketId': ticket['id'], // ✅ WAJIB
+        'ticketId': ticket['id'], 
       }),
     );
 
@@ -83,7 +83,7 @@ class HomePage extends StatelessWidget {
                     child: Text("Beli"),
                     onPressed: () {
                       beliTiket(
-                        data[index], // ✅ kirim full object
+                        data[index], 
                         context,
                       );
                     },

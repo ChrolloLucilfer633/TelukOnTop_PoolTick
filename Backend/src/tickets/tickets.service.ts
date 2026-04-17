@@ -5,12 +5,12 @@ import { PrismaService } from '../prisma/prisma.service';
 export class TicketsService {
   constructor(private prisma: PrismaService) {}
 
-  // 🔥 GET ALL
+  // GET ALL
   async findAll() {
     return await this.prisma.ticket.findMany();
   }
 
-  // 🔥 GET BY ID
+  // GET BY ID
   async findOne(id: number) {
     return await this.prisma.ticket.findUnique({
       where: {
@@ -19,7 +19,7 @@ export class TicketsService {
     });
   }
 
-  // 🔥 CREATE
+  // CREATE
   async create(data: any) {
     return await this.prisma.ticket.create({
       data: {
@@ -29,7 +29,7 @@ export class TicketsService {
     });
   }
 
-  // 🔥 PATCH (GANTI UPDATE)
+  // PATCH 
   async patch(id: number, data: any) {
     return await this.prisma.ticket.update({
       where: {
@@ -42,7 +42,7 @@ export class TicketsService {
     });
   }
 
-  // 🔥 DELETE
+  // DELETE
   async delete(id: number) {
     return await this.prisma.ticket.delete({
       where: {

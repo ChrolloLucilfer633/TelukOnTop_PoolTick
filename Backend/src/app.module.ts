@@ -8,7 +8,7 @@ import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
-    PrismaModule, // 🔥 koneksi DB via Prisma
+    PrismaModule, 
     TicketsModule,
     TransactionsModule,
   ],

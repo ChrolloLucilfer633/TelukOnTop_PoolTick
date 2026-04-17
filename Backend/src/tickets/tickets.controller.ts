@@ -5,31 +5,31 @@ import { TicketsService } from './tickets.service';
 export class TicketsController {
   constructor(private readonly ticketsService: TicketsService) {}
 
-  // 🔥 GET ALL
+  // GET ALL
   @Get()
   getAllTickets() {
     return this.ticketsService.findAll();
   }
 
-  // 🔥 GET BY ID
+  // GET BY ID
   @Get(':id')
   getTicketById(@Param('id') id: string) {
     return this.ticketsService.findOne(Number(id));
   }
 
-  // 🔥 CREATE
+  // CREATE
   @Post()
   createTicket(@Body() body: any) {
     return this.ticketsService.create(body);
   }
 
-  // 🔥 PATCH (GANTI UPDATE)
+  // PATCH 
   @Patch(':id')
   patchTicket(@Param('id') id: string, @Body() body: any) {
     return this.ticketsService.patch(Number(id), body);
   }
 
-  // 🔥 DELETE
+  // DELETE
   @Delete(':id')
   deleteTicket(@Param('id') id: string) {
     return this.ticketsService.delete(Number(id));

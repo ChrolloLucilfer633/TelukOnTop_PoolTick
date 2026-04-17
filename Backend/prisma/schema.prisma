@@ -17,9 +17,9 @@ model Ticket {
 
 model Transaction {
   id       Int    @id @default(autoincrement())
-  name     String
+  ticketId Int
+  name     String   // (nama pembeli)
   price    Int
 
-  ticketId Int
   ticket   Ticket @relation(fields: [ticketId], references: [id])
 }
