@@ -3,119 +3,121 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PoolTick CMS</title>
+  <title>PoolTick CMS | Admin Panel</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body {
-      background-color: #f8f9fa;
+    :root {
+      --primary-blue: #0d6efd;
+      --light-blue: #e3f2fd;
     }
-    .bg-blue {
-      background-color: #0d6efd;
-    }
-    .bg-light-blue {
-      background-color: #e3f2fd;
-    }
-    .card {
-      border: none;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    #login-container {
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .bg-blue { background-color: var(--primary-blue); }
+    .bg-light-blue { background-color: var(--light-blue); }
+    .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .btn-primary { border-radius: 8px; padding: 10px 20px; }
+    .form-control { border-radius: 8px; padding: 10px; }
+    #login-container { height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .table thead { background-color: var(--light-blue); }
+    .sticky-top-custom { position: sticky; top: 20px; }
   </style>
 </head>
 <body>
 
-<div id="login" class="container" style="display: block;">
+<div id="login" class="container">
   <div id="login-container">
-    <div class="card p-4" style="width: 100%; max-width: 400px;">
+    <div class="card p-4 shadow-lg" style="width: 100%; max-width: 400px;">
       <div class="text-center mb-4">
-        <h2 class="fw-bold text-primary">PoolTick</h2>
-        <p class="text-muted">Login Admin</p>
+        <h2 class="fw-bold text-primary">🏊 PoolTick</h2>
+        <p class="text-muted">Manajemen Tiket Kolam Renang</p>
       </div>
       <div class="mb-3">
         <label class="form-label">Username</label>
-        <input type="text" id="username" class="form-control" placeholder="Masukkan Username">
+        <input type="text" id="username" class="form-control" placeholder="admin">
       </div>
       <div class="mb-3">
         <label class="form-label">Password</label>
-        <input type="password" id="password" class="form-control" placeholder="Masukkan Password">
+        <input type="password" id="password" class="form-control" placeholder="••••••">
       </div>
-      <button onclick="login()" class="btn btn-primary w-100 shadow-sm">Login</button>
+      <button onclick="login()" class="btn btn-primary w-100 fw-bold">Masuk ke Dashboard</button>
     </div>
   </div>
 </div>
 
 <div id="dashboard" style="display:none;">
-  <nav class="navbar navbar-dark bg-blue mb-4 shadow">
+  <nav class="navbar navbar-dark bg-blue mb-4 shadow-sm">
     <div class="container">
-      <span class="navbar-brand mb-0 h1 fw-bold">PoolTick Dashboard</span>
-      <button class="btn btn-outline-light btn-sm" onclick="location.reload()">Logout</button>
+      <span class="navbar-brand fw-bold fs-4">🏊 PoolTick Dashboard</span>
+      <button class="btn btn-light btn-sm fw-bold text-primary" onclick="location.reload()">LOGOUT</button>
     </div>
   </nav>
 
   <div class="container pb-5">
-    <div class="row">
-      <div class="col-12 mb-4">
-        <div class="card bg-light-blue p-3 text-center border-info">
-          <h3 id="total" class="m-0 text-primary fw-bold">Total Pendapatan: Rp 0</h3>
-        </div>
-      </div>
-
-      <div class="col-md-4 mb-4">
-        <div class="card p-4 h-100">
-          <h4 class="mb-3 text-primary">Kelola Tiket</h4>
-          <input type="hidden" id="editId">
-          <div class="mb-3">
-            <label class="form-label small fw-bold">Nama Tiket</label>
-            <input type="text" id="name" class="form-control" placeholder="Contoh: Tiket Dewasa">
+    <div class="row g-4">
+      
+      <div class="col-lg-4">
+        <div class="sticky-top-custom">
+          <div class="card bg-blue text-white p-4 mb-4 text-center">
+            <p class="mb-1 opacity-75">Total Pendapatan</p>
+            <h2 id="total" class="fw-bold mb-0 text-white">Rp 0</h2>
           </div>
-          <div class="mb-3">
-            <label class="form-label small fw-bold">Harga</label>
-            <div class="input-group">
-              <span class="input-group-text">Rp</span>
-              <input type="number" id="price" class="form-control" placeholder="0">
+
+          <div class="card p-4 mb-4 border-start border-4 border-success">
+            <h5 class="fw-bold text-success mb-3">Kasir Cepat</h5>
+            <label class="form-label small text-muted">Nama Pembeli saat ini:</label>
+            <input type="text" id="buyerName" class="form-control border-success" placeholder="Nama pelanggan...">
+          </div>
+
+          <div class="card p-4">
+            <h5 class="fw-bold text-primary mb-3">Kelola Produk Tiket</h5>
+            <input type="hidden" id="editId">
+            <div class="mb-2">
+              <input type="text" id="name" class="form-control" placeholder="Nama Tiket (ex: Reguler)">
+            </div>
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text">Rp</span>
+                <input type="number" id="price" class="form-control" placeholder="Harga">
+              </div>
+            </div>
+            <div class="d-grid gap-2">
+              <button onclick="submitTiket()" class="btn btn-primary fw-bold">Simpan Perubahan</button>
+              <button onclick="resetForm()" class="btn btn-outline-secondary btn-sm">Batal / Reset</button>
             </div>
           </div>
-          <div class="d-grid gap-2">
-            <button onclick="submitTiket()" class="btn btn-primary">Simpan Tiket</button>
-            <button onclick="resetForm()" class="btn btn-light border">Reset</button>
-          </div>
         </div>
       </div>
 
-      <div class="col-md-8 mb-4">
-        <div class="card p-4 h-100">
-          <h4 class="mb-3 text-primary">Daftar Tiket Tersedia</h4>
+      <div class="col-lg-8">
+        <div class="card p-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold m-0">Daftar Produk Tiket</h5>
+            <span class="badge bg-primary rounded-pill" id="ticketCount">0 Item</span>
+          </div>
           <div class="table-responsive">
             <table class="table table-hover align-middle">
-              <thead class="table-light">
+              <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Nama</th>
+                  <th width="50">ID</th>
+                  <th>Nama Layanan</th>
                   <th>Harga</th>
-                  <th class="text-center">Aksi</th>
+                  <th class="text-end">Opsi</th>
                 </tr>
               </thead>
               <tbody id="data"></tbody>
             </table>
           </div>
         </div>
-      </div>
 
-      <div class="col-12">
         <div class="card p-4">
-          <h4 class="mb-3 text-info">Riwayat Transaksi</h4>
+          <h5 class="fw-bold text-info mb-3">Riwayat Transaksi Masuk</h5>
           <div class="table-responsive">
             <table class="table table-striped align-middle">
-              <thead class="bg-light-blue">
+              <thead class="table-dark">
                 <tr>
                   <th>ID</th>
-                  <th>Nama Tiket</th>
-                  <th>Harga</th>
+                  <th>Pembeli</th>
+                  <th>Item</th>
+                  <th>Nominal</th>
                   <th class="text-center">Aksi</th>
                 </tr>
               </thead>
@@ -124,102 +126,120 @@
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-// Logic 
+const API_TICKETS = 'http://localhost:3000/tickets';
+const API_TRANSACTIONS = 'http://localhost:3000/transactions';
+
+// Helper Format Rupiah
+const formatRupiah = (num) => "Rp " + Number(num).toLocaleString('id-ID');
+
+// LOGIN
 function login() {
   const user = document.getElementById('username').value;
   const pass = document.getElementById('password').value;
-
   if (user === "1" && pass === "1") {
     document.getElementById('login').style.display = "none";
     document.getElementById('dashboard').style.display = "block";
     loadData();
   } else {
-    alert("Login gagal! Coba lagi.");
+    alert("Kombinasi Username & Password salah!");
   }
 }
 
-function loadData() {
-  document.getElementById('data').innerHTML = "";
-  document.getElementById('transaksi').innerHTML = "";
+// LOAD DATA (REFRESH VIEW)
+async function loadData() {
+  try {
+    const [resTickets, resTransactions] = await Promise.all([
+      fetch(API_TICKETS),
+      fetch(API_TRANSACTIONS)
+    ]);
 
-  fetch('http://localhost:3000/tickets')
-    .then(res => res.json())
-    .then(data => {
-      const table = document.getElementById('data');
-      data.forEach(item => {
-        table.innerHTML += `
-          <tr>
-            <td><span class="badge bg-secondary">${item.id}</span></td>
-            <td class="fw-bold text-dark">${item.name}</td>
-            <td>Rp ${item.price.toLocaleString()}</td>
-            <td class="text-center">
-              <button class="btn btn-sm btn-outline-primary" onclick="editTiket(${item.id}, '${item.name}', ${item.price})">Edit</button>
-              <button class="btn btn-sm btn-outline-info" onclick="beliTiket(${item.id})">Beli</button>
-              <button class="btn btn-sm btn-outline-danger" onclick="hapusTiket(${item.id})">Hapus</button>
-            </td>
-          </tr>
-        `;
-      });
-    });
+    const tickets = await resTickets.json();
+    const transactions = await resTransactions.json();
 
-  fetch('http://localhost:3000/transactions')
-    .then(res => res.json())
-    .then(data => {
-      const table = document.getElementById('transaksi');
-      const total = document.getElementById('total');
-      let totalTransaksi = 0;
-
-      data.forEach(item => {
-        totalTransaksi += item.price;
-        table.innerHTML += `
-          <tr>
-            <td>#${item.id}</td>
-            <td>${item.ticket?.name || item.name}</td>
-            <td class="text-success fw-bold">Rp ${item.price.toLocaleString()}</td>
-            <td class="text-center">
-              <button class="btn btn-sm btn-danger" onclick="hapusTransaksi(${item.id})">Batalkan</button>
-            </td>
-          </tr>
-        `;
-      });
-      total.innerText = "Total Pendapatan: Rp " + totalTransaksi.toLocaleString();
-    });
+    renderTickets(tickets);
+    renderTransactions(transactions);
+  } catch (err) {
+    console.error("Gagal memuat data:", err);
+  }
 }
 
-function submitTiket() {
+function renderTickets(data) {
+  const container = document.getElementById('data');
+  document.getElementById('ticketCount').innerText = `${data.length} Item`;
+  container.innerHTML = "";
+  
+  data.forEach(item => {
+    container.innerHTML += `
+      <tr>
+        <td><small class="text-muted">#${item.id}</small></td>
+        <td class="fw-bold text-primary">${item.name}</td>
+        <td>${formatRupiah(item.price)}</td>
+        <td class="text-end">
+          <button onclick="editTiket(${item.id}, '${item.name}', ${item.price})" class="btn btn-sm btn-outline-warning border-0">✏️</button>
+          <button onclick="beliTiket(${item.id})" class="btn btn-sm btn-success px-3 rounded-pill shadow-sm">Beli</button>
+          <button onclick="hapusTiket(${item.id})" class="btn btn-sm btn-outline-danger border-0">🗑️</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function renderTransactions(data) {
+  const container = document.getElementById('transaksi');
+  let totalPendapatan = 0;
+  container.innerHTML = "";
+
+  data.forEach(item => {
+    totalPendapatan += item.price || 0;
+    container.innerHTML += `
+      <tr>
+        <td><small class="text-muted">${item.id}</small></td>
+        <td class="fw-bold">${item.name}</td>
+        <td><span class="badge bg-light text-dark border">${item.ticket?.name || 'Tiket Terhapus'}</span></td>
+        <td class="text-success fw-bold">${formatRupiah(item.price)}</td>
+        <td class="text-center">
+          <button onclick="hapusTransaksi(${item.id})" class="btn btn-link text-danger btn-sm p-0">Batalkan</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  document.getElementById('total').innerText = formatRupiah(totalPendapatan);
+}
+
+// SUBMIT (CREATE / UPDATE)
+async function submitTiket() {
   const id = document.getElementById('editId').value;
   const name = document.getElementById('name').value;
   const price = document.getElementById('price').value;
 
-  if (!name || !price) return alert("Isi data dengan lengkap!");
+  if(!name || !price) return alert("Mohon lengkapi data tiket!");
 
+  const url = id ? `${API_TICKETS}/${id}` : API_TICKETS;
   const method = id ? 'PATCH' : 'POST';
-  const url = id ? `http://localhost:3000/tickets/${id}` : 'http://localhost:3000/tickets';
 
-  fetch(url, {
-    method: method,
+  await fetch(url, {
+    method,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name: name, price: parseInt(price) })
-  })
-  .then(() => {
-    alert(id ? "Berhasil diperbarui!" : "Tiket berhasil ditambahkan!");
-    resetForm();
-    loadData();
+    body: JSON.stringify({ name, price: parseInt(price) })
   });
+
+  alert("Data tiket berhasil disimpan!");
+  resetForm();
+  loadData();
 }
 
 function editTiket(id, name, price) {
   document.getElementById('editId').value = id;
   document.getElementById('name').value = name;
   document.getElementById('price').value = price;
-  window.scrollTo(0,0);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function resetForm() {
@@ -228,36 +248,47 @@ function resetForm() {
   document.getElementById('price').value = "";
 }
 
-function beliTiket(id) {
-  // Ambil data tiket dulu untuk mendapatkan harga dan nama
-  fetch(`http://localhost:3000/tickets/${id}`)
-    .then(res => res.json())
-    .then(ticket => {
-      fetch('http://localhost:3000/transactions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          ticketId: ticket.id,
-          name: ticket.name,
-          price: ticket.price 
-        })
-      })
-      .then(() => {
-        alert("Pembelian Berhasil!");
-        loadData();
-      });
-    });
+// BELI (TRANSACTION)
+async function beliTiket(id) {
+  const buyerName = document.getElementById('buyerName').value;
+
+  if (!buyerName) {
+    alert("Tolong isi Nama Pembeli terlebih dahulu di kolom Kasir!");
+    document.getElementById('buyerName').focus();
+    return;
+  }
+
+  // Ambil data tiket dulu untuk mendapatkan harga terbaru
+  const res = await fetch(`${API_TICKETS}/${id}`);
+  const ticket = await res.json();
+
+  await fetch(API_TRANSACTIONS, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      ticketId: ticket.id,
+      name: buyerName, // Nama Pembeli
+      price: ticket.price // Simpan harga saat transaksi terjadi
+    })
+  });
+
+  alert(`Tiket ${ticket.name} berhasil dibeli oleh ${buyerName}!`);
+  document.getElementById('buyerName').value = "";
+  loadData();
 }
 
-function hapusTiket(id) {
-  if(confirm("Hapus tiket ini?")) {
-    fetch(`http://localhost:3000/tickets/${id}`, { method: 'DELETE' }).then(() => loadData());
+// DELETE OPS
+async function hapusTiket(id) {
+  if(confirm("Hapus tiket ini secara permanen?")) {
+    await fetch(`${API_TICKETS}/${id}`, { method: 'DELETE' });
+    loadData();
   }
 }
 
-function hapusTransaksi(id) {
+async function hapusTransaksi(id) {
   if(confirm("Batalkan transaksi ini?")) {
-    fetch(`http://localhost:3000/transactions/${id}`, { method: 'DELETE' }).then(() => loadData());
+    await fetch(`${API_TRANSACTIONS}/${id}`, { method: 'DELETE' });
+    loadData();
   }
 }
 </script>

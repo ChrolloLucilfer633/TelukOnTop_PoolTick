@@ -17,6 +17,7 @@ export class TransactionsService {
     });
   }
 
+<<<<<<< HEAD
   // ✅ GET TRANSAKSI HARI INI (buat export excel)
   findToday() {
     const now = new Date();
@@ -51,20 +52,40 @@ export class TransactionsService {
       where: { id: ticketId },
     });
 
+=======
+  // CREATE TRANSAKSI
+  async create(data: any) {
+    console.log("DATA MASUK:", data);
+
+    const ticketId = Number(data.ticketId);
+
+    const ticket = await this.prisma.ticket.findUnique({
+      where: { id: ticketId },
+    });
+
+>>>>>>> 22588f44973656a4be4be754bd90d73de79fd3d3
     if (!ticket) {
       return { message: 'Ticket tidak ditemukan' };
     }
 
     return this.prisma.transaction.create({
       data: {
+<<<<<<< HEAD
         name: data.name, // 👉 nama pembeli
+=======
+        name: data.name,
+>>>>>>> 22588f44973656a4be4be754bd90d73de79fd3d3
         price: ticket.price,
         ticketId: ticket.id,
       },
     });
   }
 
+<<<<<<< HEAD
   // ✅ DELETE
+=======
+  // DELETE
+>>>>>>> 22588f44973656a4be4be754bd90d73de79fd3d3
   delete(id: number) {
     return this.prisma.transaction.delete({
       where: { id: Number(id) },
