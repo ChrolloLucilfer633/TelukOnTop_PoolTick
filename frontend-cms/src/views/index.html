@@ -3,131 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PoolTick CMS | Admin Panel</title>
+  <title>PoolTick CMS</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    :root {
-      --primary-blue: #0d6efd;
-      --light-blue: #e3f2fd;
-    }
-    body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    .bg-blue { background-color: var(--primary-blue); }
-    .bg-light-blue { background-color: var(--light-blue); }
-    .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .btn-primary { border-radius: 8px; padding: 10px 20px; }
-    .form-control { border-radius: 8px; padding: 10px; }
-    #login-container { height: 100vh; display: flex; align-items: center; justify-content: center; }
-    .table thead { background-color: var(--light-blue); }
-    .sticky-top-custom { position: sticky; top: 20px; }
+    body { background-color: #f0f2f5; }
+    .bg-blue { background-color: #0d6efd; }
+    .card { border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    #login-container { height: 100vh; display:flex; align-items:center; justify-content:center; }
   </style>
 </head>
+
 <body>
 
+<!-- LOGIN -->
 <div id="login" class="container">
   <div id="login-container">
-    <div class="card p-4 shadow-lg" style="width: 100%; max-width: 400px;">
-      <div class="text-center mb-4">
-        <h2 class="fw-bold text-primary">🏊 PoolTick</h2>
-        <p class="text-muted">Manajemen Tiket Kolam Renang</p>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Username</label>
-        <input type="text" id="username" class="form-control" placeholder="admin">
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Password</label>
-        <input type="password" id="password" class="form-control" placeholder="••••••">
-      </div>
-      <button onclick="login()" class="btn btn-primary w-100 fw-bold">Masuk ke Dashboard</button>
+    <div class="card p-4" style="max-width:400px;">
+      <h2 class="text-center text-primary">🏊 PoolTick</h2>
+      <input type="text" id="username" class="form-control my-2" placeholder="admin">
+      <input type="password" id="password" class="form-control my-2" placeholder="••••••">
+      <button onclick="login()" class="btn btn-primary w-100">Login</button>
     </div>
   </div>
 </div>
 
+<!-- DASHBOARD -->
 <div id="dashboard" style="display:none;">
-  <nav class="navbar navbar-dark bg-blue mb-4 shadow-sm">
+  <nav class="navbar navbar-dark bg-blue mb-4">
     <div class="container">
-      <span class="navbar-brand fw-bold fs-4">🏊 PoolTick Dashboard</span>
-      <button class="btn btn-light btn-sm fw-bold text-primary" onclick="location.reload()">LOGOUT</button>
+      <span class="navbar-brand">🏊 PoolTick Dashboard</span>
+      <button onclick="location.reload()" class="btn btn-light btn-sm">Logout</button>
     </div>
   </nav>
 
-  <div class="container pb-5">
-    <div class="row g-4">
-      
-      <div class="col-lg-4">
-        <div class="sticky-top-custom">
-          <div class="card bg-blue text-white p-4 mb-4 text-center">
-            <p class="mb-1 opacity-75">Total Pendapatan</p>
-            <h2 id="total" class="fw-bold mb-0 text-white">Rp 0</h2>
-          </div>
+  <div class="container">
 
-          <div class="card p-4 mb-4 border-start border-4 border-success">
-            <h5 class="fw-bold text-success mb-3">Kasir Cepat</h5>
-            <label class="form-label small text-muted">Nama Pembeli saat ini:</label>
-            <input type="text" id="buyerName" class="form-control border-success" placeholder="Nama pelanggan...">
-          </div>
-
-          <div class="card p-4">
-            <h5 class="fw-bold text-primary mb-3">Kelola Produk Tiket</h5>
-            <input type="hidden" id="editId">
-            <div class="mb-2">
-              <input type="text" id="name" class="form-control" placeholder="Nama Tiket (ex: Reguler)">
-            </div>
-            <div class="mb-3">
-              <div class="input-group">
-                <span class="input-group-text">Rp</span>
-                <input type="number" id="price" class="form-control" placeholder="Harga">
-              </div>
-            </div>
-            <div class="d-grid gap-2">
-              <button onclick="submitTiket()" class="btn btn-primary fw-bold">Simpan Perubahan</button>
-              <button onclick="resetForm()" class="btn btn-outline-secondary btn-sm">Batal / Reset</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-8">
-        <div class="card p-4 mb-4">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold m-0">Daftar Produk Tiket</h5>
-            <span class="badge bg-primary rounded-pill" id="ticketCount">0 Item</span>
-          </div>
-          <div class="table-responsive">
-            <table class="table table-hover align-middle">
-              <thead>
-                <tr>
-                  <th width="50">ID</th>
-                  <th>Nama Layanan</th>
-                  <th>Harga</th>
-                  <th class="text-end">Opsi</th>
-                </tr>
-              </thead>
-              <tbody id="data"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="card p-4">
-          <h5 class="fw-bold text-info mb-3">Riwayat Transaksi Masuk</h5>
-          <div class="table-responsive">
-            <table class="table table-striped align-middle">
-              <thead class="table-dark">
-                <tr>
-                  <th>ID</th>
-                  <th>Pembeli</th>
-                  <th>Item</th>
-                  <th>Nominal</th>
-                  <th class="text-center">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="transaksi"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
+    <!-- TOTAL -->
+    <div class="card p-3 text-center mb-4">
+      <h3 id="total">Rp 0</h3>
     </div>
+
+    <!-- INPUT PEMBELI -->
+    <input type="text" id="buyerName" class="form-control mb-3" placeholder="Nama Pembeli">
+
+    <div class="row">
+      <!-- FORM -->
+      <div class="col-md-4">
+        <div class="card p-3">
+          <input type="hidden" id="editId">
+          <input type="text" id="name" class="form-control my-2" placeholder="Nama tiket">
+          <input type="number" id="price" class="form-control my-2" placeholder="Harga">
+          <button onclick="submitTiket()" class="btn btn-primary w-100">Simpan</button>
+        </div>
+      </div>
+
+      <!-- LIST -->
+      <div class="col-md-8">
+        <div class="card p-3">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nama</th>
+                <th>Harga</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="data"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSAKSI -->
+    <div class="card p-3 mt-4">
+
+      <div class="d-flex justify-content-between mb-2">
+        <h5>Riwayat Transaksi</h5>
+        <button onclick="downloadExcel()" class="btn btn-success btn-sm">
+          ⬇️ Download Excel Hari Ini
+        </button>
+      </div>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Pembeli</th>
+            <th>Tiket</th>
+            <th>Harga</th>
+            <th>Tanggal</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="transaksi"></tbody>
+      </table>
+    </div>
+
   </div>
 </div>
 
@@ -135,161 +107,166 @@
 const API_TICKETS = 'http://localhost:3000/tickets';
 const API_TRANSACTIONS = 'http://localhost:3000/transactions';
 
-// Helper Format Rupiah
-const formatRupiah = (num) => "Rp " + Number(num).toLocaleString('id-ID');
-
 // LOGIN
 function login() {
   const user = document.getElementById('username').value;
   const pass = document.getElementById('password').value;
+
   if (user === "1" && pass === "1") {
     document.getElementById('login').style.display = "none";
     document.getElementById('dashboard').style.display = "block";
     loadData();
   } else {
-    alert("Kombinasi Username & Password salah!");
+    alert("Login gagal!");
   }
 }
 
-// LOAD DATA (REFRESH VIEW)
+// LOAD DATA
 async function loadData() {
-  try {
-    const [resTickets, resTransactions] = await Promise.all([
-      fetch(API_TICKETS),
-      fetch(API_TRANSACTIONS)
-    ]);
+  const tickets = await fetch(API_TICKETS).then(r=>r.json());
+  const transactions = await fetch(API_TRANSACTIONS).then(r=>r.json());
 
-    const tickets = await resTickets.json();
-    const transactions = await resTransactions.json();
+  const dataEl = document.getElementById('data');
+  const trxEl = document.getElementById('transaksi');
 
-    renderTickets(tickets);
-    renderTransactions(transactions);
-  } catch (err) {
-    console.error("Gagal memuat data:", err);
-  }
-}
+  dataEl.innerHTML = "";
+  trxEl.innerHTML = "";
 
-function renderTickets(data) {
-  const container = document.getElementById('data');
-  document.getElementById('ticketCount').innerText = `${data.length} Item`;
-  container.innerHTML = "";
-  
-  data.forEach(item => {
-    container.innerHTML += `
+  let total = 0;
+
+  // TICKETS
+  tickets.forEach(i=>{
+    dataEl.innerHTML += `
       <tr>
-        <td><small class="text-muted">#${item.id}</small></td>
-        <td class="fw-bold text-primary">${item.name}</td>
-        <td>${formatRupiah(item.price)}</td>
-        <td class="text-end">
-          <button onclick="editTiket(${item.id}, '${item.name}', ${item.price})" class="btn btn-sm btn-outline-warning border-0">✏️</button>
-          <button onclick="beliTiket(${item.id})" class="btn btn-sm btn-success px-3 rounded-pill shadow-sm">Beli</button>
-          <button onclick="hapusTiket(${item.id})" class="btn btn-sm btn-outline-danger border-0">🗑️</button>
+        <td>${i.id}</td>
+        <td>${i.name}</td>
+        <td>Rp ${i.price}</td>
+        <td>
+          <button onclick="editTiket(${i.id}, '${i.name}', ${i.price})" class="btn btn-warning btn-sm">Edit</button>
+          <button onclick="beliTiket(${i.id})" class="btn btn-success btn-sm">Beli</button>
+          <button onclick="hapusTiket(${i.id})" class="btn btn-danger btn-sm">Hapus</button>
         </td>
-      </tr>
-    `;
+      </tr>`;
   });
-}
 
-function renderTransactions(data) {
-  const container = document.getElementById('transaksi');
-  let totalPendapatan = 0;
-  container.innerHTML = "";
+  // TRANSAKSI
+  transactions.forEach(i=>{
+    total += i.price;
 
-  data.forEach(item => {
-    totalPendapatan += item.price || 0;
-    container.innerHTML += `
+    trxEl.innerHTML += `
       <tr>
-        <td><small class="text-muted">${item.id}</small></td>
-        <td class="fw-bold">${item.name}</td>
-        <td><span class="badge bg-light text-dark border">${item.ticket?.name || 'Tiket Terhapus'}</span></td>
-        <td class="text-success fw-bold">${formatRupiah(item.price)}</td>
-        <td class="text-center">
-          <button onclick="hapusTransaksi(${item.id})" class="btn btn-link text-danger btn-sm p-0">Batalkan</button>
+        <td>${i.id}</td>
+        <td>${i.name}</td>
+        <td>${i.ticket?.name || '-'}</td>
+        <td>Rp ${i.price}</td>
+        <td>${i.createdAt ? new Date(i.createdAt).toLocaleString('id-ID') : '-'}</td>
+        <td>
+          <button onclick="hapusTransaksi(${i.id})" class="btn btn-danger btn-sm">Hapus</button>
         </td>
-      </tr>
-    `;
+      </tr>`;
   });
 
-  document.getElementById('total').innerText = formatRupiah(totalPendapatan);
+  document.getElementById('total').innerText = "Rp " + total;
 }
 
-// SUBMIT (CREATE / UPDATE)
-async function submitTiket() {
-  const id = document.getElementById('editId').value;
-  const name = document.getElementById('name').value;
-  const price = document.getElementById('price').value;
-
-  if(!name || !price) return alert("Mohon lengkapi data tiket!");
-
-  const url = id ? `${API_TICKETS}/${id}` : API_TICKETS;
-  const method = id ? 'PATCH' : 'POST';
-
-  await fetch(url, {
-    method,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, price: parseInt(price) })
-  });
-
-  alert("Data tiket berhasil disimpan!");
-  resetForm();
-  loadData();
-}
-
-function editTiket(id, name, price) {
+// EDIT
+function editTiket(id, nameVal, priceVal){
   document.getElementById('editId').value = id;
-  document.getElementById('name').value = name;
-  document.getElementById('price').value = price;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('name').value = nameVal;
+  document.getElementById('price').value = priceVal;
 }
 
-function resetForm() {
+// CREATE / UPDATE
+function submitTiket(){
+  const id = document.getElementById('editId').value;
+  const method = id ? 'PATCH' : 'POST';
+  const url = id ? API_TICKETS + "/" + id : API_TICKETS;
+
+  fetch(url,{
+    method,
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      name: document.getElementById('name').value,
+      price: parseInt(document.getElementById('price').value)
+    })
+  }).then(()=>{
+    resetForm();
+    loadData();
+  });
+}
+
+// RESET
+function resetForm(){
   document.getElementById('editId').value = "";
   document.getElementById('name').value = "";
   document.getElementById('price').value = "";
 }
 
-// BELI (TRANSACTION)
-async function beliTiket(id) {
-  const buyerName = document.getElementById('buyerName').value;
+// BELI
+function beliTiket(id){
+  const buyer = document.getElementById('buyerName').value;
+  if(!buyer) return alert("Isi nama pembeli");
 
-  if (!buyerName) {
-    alert("Tolong isi Nama Pembeli terlebih dahulu di kolom Kasir!");
-    document.getElementById('buyerName').focus();
-    return;
-  }
-
-  // Ambil data tiket dulu untuk mendapatkan harga terbaru
-  const res = await fetch(`${API_TICKETS}/${id}`);
-  const ticket = await res.json();
-
-  await fetch(API_TRANSACTIONS, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      ticketId: ticket.id,
-      name: buyerName, // Nama Pembeli
-      price: ticket.price // Simpan harga saat transaksi terjadi
-    })
+  fetch(API_TICKETS+"/"+id)
+  .then(r=>r.json())
+  .then(t=>{
+    fetch(API_TRANSACTIONS,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        ticketId:t.id,
+        name:buyer,
+        price:t.price
+      })
+    }).then(()=>{
+      document.getElementById('buyerName').value="";
+      loadData();
+    });
   });
-
-  alert(`Tiket ${ticket.name} berhasil dibeli oleh ${buyerName}!`);
-  document.getElementById('buyerName').value = "";
-  loadData();
 }
 
-// DELETE OPS
-async function hapusTiket(id) {
-  if(confirm("Hapus tiket ini secara permanen?")) {
-    await fetch(`${API_TICKETS}/${id}`, { method: 'DELETE' });
-    loadData();
-  }
+// DELETE
+function hapusTiket(id){
+  fetch(API_TICKETS+"/"+id,{method:'DELETE'}).then(loadData);
 }
 
-async function hapusTransaksi(id) {
-  if(confirm("Batalkan transaksi ini?")) {
-    await fetch(`${API_TRANSACTIONS}/${id}`, { method: 'DELETE' });
-    loadData();
-  }
+function hapusTransaksi(id){
+  fetch(API_TRANSACTIONS+"/"+id,{method:'DELETE'}).then(loadData);
+}
+
+// DOWNLOAD EXCEL
+function downloadExcel() {
+  fetch(API_TRANSACTIONS)
+    .then(res => res.json())
+    .then(data => {
+
+      const today = new Date().toDateString();
+
+      const filtered = data.filter(i =>
+        new Date(i.createdAt).toDateString() === today
+      );
+
+      if (filtered.length === 0) {
+        alert("Tidak ada data hari ini!");
+        return;
+      }
+
+      let csv = "ID,Nama Pembeli,Tiket,Harga,Tanggal\n";
+
+      filtered.forEach(i => {
+        csv += `${i.id},${i.name},${i.ticket?.name || '-'},${i.price},${new Date(i.createdAt).toLocaleString('id-ID')}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = "transaksi_harian.csv";
+      a.click();
+
+      window.URL.revokeObjectURL(url);
+    });
 }
 </script>
 
