@@ -16,10 +16,11 @@ model Ticket {
 }
 
 model Transaction {
-  id       Int    @id @default(autoincrement())
-  ticketId Int
-  name     String   // (nama pembeli)
-  price    Int
+  id        Int      @id @default(autoincrement())
+  name      String
+  price     Int
+  ticketId  Int
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
 
-  ticket   Ticket @relation(fields: [ticketId], references: [id])
+  createdAt DateTime @default(now()) 
 }
