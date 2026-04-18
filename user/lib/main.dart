@@ -36,7 +36,7 @@ class HomePage extends StatelessWidget {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Gagal beli tiket"),
+          content: Text("Gagal  beli tiket"),
         ),
       );
     }
