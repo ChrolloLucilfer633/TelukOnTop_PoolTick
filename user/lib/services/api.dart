@@ -1,14 +1,26 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-Future<List<dynamic>> getTickets() async {
-  final response = await http.get(
-    Uri.parse('http://10.0.2.2:3000/tickets'),
-  );
+class ApiService {
 
-  if (response.statusCode == 200) {
-    return jsonDecode(response.body);
-  } else {
-    throw Exception('Gagal load tiket');
+  static Future<List<dynamic>> getTickets() async {
+    final res = await http.get(
+      Uri.parse('http://localhost:3000/tickets'),
+    );
+
+    return json.decode(res.body);
+  }
+
+  static Future<bool> beliTiket(int id, String name) async {
+    final res = await http.post(
+      Uri.parse('http://localhost:3000/transactions'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'ticketId': id,
+        'name': name,
+      }),
+    );
+
+    return res.statusCode == 200 || res.statusCode == 201;
   }
 }
