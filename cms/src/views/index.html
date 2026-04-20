@@ -263,6 +263,29 @@ function resetForm() {
 }
 
 
+/*Hapus tiket*/
+async function hapusTiket(id) {
+  console.log("klik hapus:", id);
+  if (!confirm("Yakin mau hapus tiket ini?")) return;
+  try {
+    const trx = await fetch(API_TRANSACTIONS).then(r => r.json());
+    console.log("data transaksi:", trx); // 👈 LIHAT INI
+    const masihDipakai = trx.some(t => t.ticketId === id);
+    console.log("masihDipakai:", masihDipakai); // 👈 LIHAT INI
+    if (masihDipakai) {
+      alert("Tiket tidak bisa dihapus karena masih ada transaksi!");
+      return;
+    }
+    await fetch(`${API_TICKETS}/${id}`, {
+      method: 'DELETE'
+    });
+    loadData();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+
 /*Untuk membeli semua*/
 async function beliSemua() {
   const buyer = document.getElementById('buyerName').value;
@@ -366,6 +389,29 @@ function hapusTiket(id) {
 function hapusTransaksi(id) {
   fetch(`${API_TRANSACTIONS}/${id}`, {method:'DELETE'}).then(loadData);
 }
+
+// download excel
+async function downloadExcel() {
+  const data = await fetch(API_TRANSACTIONS).then(r => r.json());
+
+  if (!data.length) return alert("Tidak ada data!");
+
+  let csv = "ID,Pembeli,Tiket,Harga,Waktu\n";
+
+  data.forEach(i => {
+    csv += `${i.id},${i.name},${i.ticket?.name || '-'},${i.price},${new Date(i.createdAt).toLocaleString()}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = "Laporan_PoolTick.csv";
+  a.click();
+}
+
+
 </script>
 
 </body>
