@@ -10,95 +10,131 @@ class BookingPage extends StatefulWidget {
 
 class _BookingPageState extends State<BookingPage> {
   final TextEditingController buyerController = TextEditingController();
+  final Map<int, int> _cart = {};
+  List _cachedTickets = [];
 
-  // State untuk menyimpan jumlah tiket per ID tiket
-  // Format: { ticketId: jumlah }
-  final Map<int, int> _ticketQuantities = {};
-
-  // Primary Color Palette
+  // Palette Warna Modern
   final Color primaryBlue = const Color(0xFF0061FF);
-  final Color backgroundGray = const Color(0xFFF0F2F5);
-  final Color darkText = const Color(0xFF1E293B);
+  final Color accentBlue = const Color(0xFF60A5FA);
+  final Color bgGray = const Color(0xFFF8FAFC);
+  final Color surfaceWhite = Colors.white;
+  final Color textDark = const Color(0xFF1E293B);
+
+  int _calculateTotal() {
+    int total = 0;
+    _cart.forEach((id, qty) {
+      var ticket = _cachedTickets.firstWhere((t) => t['id'] == id, orElse: () => null);
+      if (ticket != null) total += (ticket['price'] as int) * qty;
+    });
+    return total;
+  }
 
   @override
   Widget build(BuildContext context) {
+    int totalBayar = _calculateTotal();
+
     return Scaffold(
-      backgroundColor: backgroundGray,
-      body: CustomScrollView(
-        slivers: [
-          // AppBar dengan Gradient
-          SliverAppBar(
-            expandedHeight: 120.0,
-            floating: false,
-            pinned: true,
-            backgroundColor: primaryBlue,
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
-              title: const Text("Pesan Tiket",
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20)),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [primaryBlue, const Color(0xFF60EFFF)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+      backgroundColor: bgGray,
+      body: Stack(
+        children: [
+          CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              _buildAppBar(),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 25, 20, 150),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionHeader("Informasi Pembeli", Icons.person_outline),
+                      const SizedBox(height: 16),
+                      _buildBuyerInput(),
+                      const SizedBox(height: 32),
+                      _buildSectionHeader("Katalog Tiket", Icons.confirmation_number_outlined),
+                      const SizedBox(height: 16),
+                      _buildTicketList(),
+                    ],
                   ),
                 ),
               ),
-            ),
+            ],
           ),
-
-          // Content Area
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionLabel("Informasi Pembeli"),
-                  const SizedBox(height: 12),
-                  _buildInputCard(),
-                  const SizedBox(height: 25),
-                  _buildSectionLabel("Tiket Tersedia"),
-                  const SizedBox(height: 12),
-                  _buildTicketList(),
-                ],
-              ),
-            ),
-          ),
+          if (totalBayar > 0) _buildAnimatedFloatingBar(totalBayar),
         ],
       ),
     );
   }
 
-  Widget _buildSectionLabel(String text) {
-    return Text(
-      text,
-      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: darkText),
+  // --- UI BUILDERS ---
+
+  Widget _buildAppBar() {
+    return SliverAppBar(
+      expandedHeight: 140.0,
+      pinned: true,
+      elevation: 0,
+      stretch: true,
+      backgroundColor: primaryBlue,
+      flexibleSpace: FlexibleSpaceBar(
+        centerTitle: false,
+        titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
+        title: const Text(
+          "Pesan Tiket",
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 22, letterSpacing: -0.5),
+        ),
+        background: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [primaryBlue, accentBlue],
+                ),
+              ),
+            ),
+            Positioned(
+              right: -50,
+              top: -20,
+              child: CircleAvatar(radius: 100, backgroundColor: Colors.white.withOpacity(0.1)),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildInputCard() {
+  Widget _buildSectionHeader(String title, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: primaryBlue),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textDark),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBuyerInput() {
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+        color: surfaceWhite,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20, offset: const Offset(0, 10)),
+        ],
       ),
       child: TextField(
         controller: buyerController,
-        style: TextStyle(color: darkText),
+        style: TextStyle(color: textDark, fontWeight: FontWeight.w500),
         decoration: InputDecoration(
-          prefixIcon: Icon(Icons.person_outline, color: primaryBlue),
-          hintText: "Siapa nama pembelinya?",
-          hintStyle: const TextStyle(color: Colors.grey),
-          filled: true,
-          fillColor: backgroundGray,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
+          hintText: "Nama lengkap sesuai identitas",
+          hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+          prefixIcon: Icon(Icons.badge_outlined, color: primaryBlue),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
         ),
       ),
     );
@@ -109,253 +145,301 @@ class _BookingPageState extends State<BookingPage> {
       future: ApiService.getTickets(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-              child: Padding(
-            padding: EdgeInsets.only(top: 20),
+          return const Center(child: Padding(
+            padding: EdgeInsets.only(top: 50),
             child: CircularProgressIndicator(),
           ));
         }
-        if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
-          return const Center(child: Text("Tiket tidak ditemukan"));
-        }
-
-        final tickets = snapshot.data as List;
-        return Column(
-          children: tickets.map((t) => _buildTicketItem(t)).toList(),
+        if (!snapshot.hasData) return const Center(child: Text("Gagal memuat tiket"));
+        
+        _cachedTickets = snapshot.data as List;
+        return ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _cachedTickets.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          itemBuilder: (context, index) => _buildModernTicketCard(_cachedTickets[index]),
         );
       },
     );
   }
 
-  Widget _buildTicketItem(Map t) {
+  Widget _buildModernTicketCard(Map t) {
     int id = t['id'];
-    // Inisialisasi kuantitas ke 1 jika belum ada di map
-    int currentQty = _ticketQuantities[id] ?? 1;
+    int qty = _cart[id] ?? 0;
+    bool isSelected = qty > 0;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8)],
+        color: surfaceWhite,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: isSelected ? primaryBlue.withOpacity(0.3) : Colors.transparent, width: 2),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(isSelected ? 0.08 : 0.04), blurRadius: 15, offset: const Offset(0, 8)),
+        ],
       ),
-      child: Column(
+      child: Row(
         children: [
-          Row(
-            children: [
-              Container(
-                height: 50, width: 50,
-                decoration: BoxDecoration(color: primaryBlue.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-                child: Icon(Icons.local_activity, color: primaryBlue),
-              ),
-              const SizedBox(width: 15),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(t['name'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: darkText)),
-                    Text("Rp ${t['price']}", style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-            ],
+          Container(
+            height: 60, width: 60,
+            decoration: BoxDecoration(color: primaryBlue.withOpacity(0.1), borderRadius: BorderRadius.circular(16)),
+            child: Icon(Icons.confirmation_num, color: primaryBlue, size: 28),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Divider(height: 1),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(t['name'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: textDark)),
+                const SizedBox(height: 4),
+                Text("Rp ${t['price']}", style: const TextStyle(color: Colors.green, fontWeight: FontWeight.w700, fontSize: 15)),
+              ],
+            ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // --- COUNTER QUANTITY ---
-              Container(
-                decoration: BoxDecoration(
-                  color: backgroundGray,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    _qtyButton(Icons.remove, () {
-                      if (currentQty > 1) {
-                        setState(() => _ticketQuantities[id] = currentQty - 1);
-                      }
-                    }),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Text("$currentQty", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    ),
-                    _qtyButton(Icons.add, () {
-                      setState(() => _ticketQuantities[id] = currentQty + 1);
-                    }),
-                  ],
-                ),
-              ),
-              
-              // --- TOMBOL BELI ---
-              ElevatedButton(
-                onPressed: () {
-                  if (buyerController.text.isEmpty) {
-                    _triggerSnackBar("Nama tidak boleh kosong!", Colors.redAccent);
-                    return;
-                  }
-                  _showMainPayment(t, currentQty);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                ),
-                child: Text("Beli $currentQty Tiket"),
-              )
-            ],
-          )
+          _buildQtySelector(id, qty),
         ],
       ),
     );
   }
 
-  Widget _qtyButton(IconData icon, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Icon(icon, size: 20, color: primaryBlue),
+  Widget _buildQtySelector(int id, int qty) {
+    return Container(
+      decoration: BoxDecoration(color: bgGray, borderRadius: BorderRadius.circular(30)),
+      child: Row(
+        children: [
+          _miniBtn(Icons.remove, () => setState(() => _cart[id] = (qty > 0) ? qty - 1 : 0)),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: SizedBox(
+              key: ValueKey(qty),
+              width: 35, 
+              child: Center(child: Text("$qty", style: TextStyle(fontWeight: FontWeight.bold, color: textDark)))
+            ),
+          ),
+          _miniBtn(Icons.add, () => setState(() => _cart[id] = qty + 1)),
+        ],
       ),
     );
   }
 
-  // --- MODAL SYSTEM ---
-
-  void _showMainPayment(Map ticket, int qty) {
-    int totalPrice = ticket['price'] * qty;
-
-    _showCustomModal(
-      context,
-      title: "Metode Pembayaran",
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: Text("Total Bayar: Rp $totalPrice", 
-            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 16)),
-        ),
-        _paymentTile(Icons.qr_code_2, "QRIS", "All Payment", () {
-          Navigator.pop(context);
-          prosesBayar(ticket, "QRIS", qty);
-        }),
-        _paymentTile(Icons.account_balance_wallet_outlined, "E-Wallet", "OVO, GoPay, Dana", () {
-          Navigator.pop(context);
-          _showSubPayment(ticket, "E-Wallet", ["OVO", "GoPay", "Dana"], qty);
-        }),
-        _paymentTile(Icons.account_balance_outlined, "M-Banking", "BCA, BRI, Mandiri", () {
-          Navigator.pop(context);
-          _showSubPayment(ticket, "M-Banking", ["BCA", "BRI", "Mandiri"], qty);
-        }),
-      ],
+  Widget _miniBtn(IconData icon, VoidCallback tap) {
+    return IconButton(
+      onPressed: tap,
+      icon: Icon(icon, size: 16, color: primaryBlue),
+      splashRadius: 20,
+      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
     );
   }
 
-  void _showSubPayment(Map ticket, String title, List<String> options, int qty) {
-    _showCustomModal(
-      context,
-      title: title,
-      showBack: true,
-      onBack: () {
-        Navigator.pop(context);
-        _showMainPayment(ticket, qty);
-      },
-      children: options.map((opt) => _paymentTile(
-        title == "E-Wallet" ? Icons.smartphone : Icons.account_balance,
-        opt,
-        "Bayar menggunakan $opt",
-        () {
-          Navigator.pop(context);
-          prosesBayar(ticket, opt, qty);
-        },
-      )).toList(),
-    );
-  }
-
-  // --- REUSABLE COMPONENTS ---
-
-  void _showCustomModal(BuildContext context, {required String title, required List<Widget> children, bool showBack = false, VoidCallback? onBack}) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+  Widget _buildAnimatedFloatingBar(int total) {
+    return Positioned(
+      bottom: 20, left: 20, right: 20,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: textDark.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [BoxShadow(color: primaryBlue.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10)))),
-            const SizedBox(height: 15),
-            Row(
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (showBack) IconButton(icon: const Icon(Icons.arrow_back_ios, size: 20), onPressed: onBack),
-                Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: darkText)),
+                Text("TOTAL HARGA", style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10, fontWeight: FontWeight.w900)),
+                Text("Rp $total", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
               ],
             ),
-            const Divider(),
-            ...children,
-            const SizedBox(height: 20),
+            const Spacer(),
+            ElevatedButton(
+              onPressed: _startPayment,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryBlue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                elevation: 0,
+              ),
+              child: const Text("Checkout", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            )
           ],
         ),
       ),
     );
   }
 
-  Widget _paymentTile(IconData icon, String title, String sub, VoidCallback tap) {
+  // --- LOGIC SECTION ---
+
+  void _startPayment() {
+    if (buyerController.text.isEmpty) {
+      _showSnack("Mohon isi nama lengkap Anda", Colors.orange);
+      return;
+    }
+    _showMainPaymentSheet();
+  }
+
+  void _showMainPaymentSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10))),
+            const SizedBox(height: 20),
+            const Text("Pilih Metode Bayar", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            _methodTile(Icons.qr_code_scanner_rounded, "QRIS", "Instan & Otomatis", () => _showQRISDialog()),
+            _methodTile(Icons.account_balance_rounded, "Transfer Bank", "BCA, Mandiri, BNI", () => _showBankSubSheet()),
+            _methodTile(Icons.wallet_rounded, "E-Wallet", "Dana, OVO, LinkAja", () => _showWalletSubSheet()),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // DIALOG QRIS
+  void _showQRISDialog() {
+    Navigator.pop(context);
+    int total = _calculateTotal();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Scan to Pay", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+            const SizedBox(height: 10),
+            Text("Rp $total", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: primaryBlue)),
+            const SizedBox(height: 25),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(color: bgGray, borderRadius: BorderRadius.circular(20)),
+              child: Image.network("https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TIKETHUB-$total"),
+            ),
+            const SizedBox(height: 25),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () { Navigator.pop(context); _executePayment("QRIS"); },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryBlue,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  padding: const EdgeInsets.symmetric(vertical: 15)
+                ),
+                child: const Text("SAYA SUDAH BAYAR", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showBankSubSheet() {
+    Navigator.pop(context);
+    _showSubSheet("Pilih Bank", [
+      {"n": "BCA", "d": "Bank Central Asia", "l": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Bank_Central_Asia.svg/1200px-Bank_Central_Asia.svg.png"},
+      {"n": "Mandiri", "d": "Bank Mandiri", "l": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Bank_Mandiri_logo_2016.svg/1200px-Bank_Mandiri_logo_2016.svg.png"},
+      {"n": "BNI", "d": "Bank Negara Indonesia", "l": "https://upload.wikimedia.org/wikipedia/id/thumb/5/55/BNI_logo.svg/1200px-BNI_logo.svg.png"},
+    ]);
+  }
+
+  void _showWalletSubSheet() {
+    Navigator.pop(context);
+    _showSubSheet("Pilih E-Wallet", [
+      {"n": "Dana", "d": "Dompet Digital DANA", "l": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Logo_dana_blue.svg/1200px-Logo_dana_blue.svg.png"},
+      {"n": "OVO", "d": "OVO Cash", "l": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Logo_ovo_purple.svg/1200px-Logo_ovo_purple.svg.png"},
+    ]);
+  }
+
+  void _showSubSheet(String title, List items) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            ...items.map((i) => _subMethodTile(i['n'], i['d'], i['l'])).toList(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _methodTile(IconData icon, String title, String sub, VoidCallback tap) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 4),
-      leading: CircleAvatar(backgroundColor: backgroundGray, child: Icon(icon, color: primaryBlue)),
+      contentPadding: const EdgeInsets.symmetric(vertical: 8),
+      leading: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(color: bgGray, borderRadius: BorderRadius.circular(15)),
+        child: Icon(icon, color: primaryBlue),
+      ),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(sub, style: const TextStyle(fontSize: 12)),
-      trailing: const Icon(Icons.chevron_right, size: 20),
+      trailing: const Icon(Icons.chevron_right_rounded),
       onTap: tap,
     );
   }
 
-  void _triggerSnackBar(String msg, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(msg),
-      backgroundColor: color,
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-    ));
+  Widget _subMethodTile(String name, String detail, String logoUrl) {
+    return ListTile(
+      leading: Image.network(logoUrl, width: 40, height: 25, fit: BoxFit.contain),
+      title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+      subtitle: Text(detail, style: const TextStyle(fontSize: 12)),
+      onTap: () { Navigator.pop(context); _executePayment(name); },
+    );
   }
 
-  Future<void> prosesBayar(Map ticket, String metode, int qty) async {
+  Future<void> _executePayment(String method) async {
     showDialog(
       context: context, 
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator())
+      builder: (_) => Center(child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+        child: const CircularProgressIndicator(),
+      ))
     );
 
-    // Kirim ID Tiket, Nama Pembeli, dan JUMLAH (qty) ke API
-    final ok = await ApiService.beliTiket(ticket['id'], buyerController.text);
-    
-    if (!mounted) return;
-    Navigator.pop(context); // Close loading
-
-    if (ok) {
-      buyerController.clear();
-      // Reset jumlah tiket untuk ID tersebut kembali ke 1
-      setState(() {
-        _ticketQuantities[ticket['id']] = 1;
-      });
-      _triggerSnackBar("Sukses! $qty Tiket ${ticket['name']} berhasil dibayar via $metode", Colors.green);
-    } else {
-      _triggerSnackBar("Maaf, terjadi kesalahan pembayaran.", Colors.redAccent);
+    bool allOk = true;
+    for (var id in _cart.keys) {
+      if (_cart[id]! > 0) {
+        bool res = await ApiService.beliTiket(id, buyerController.text);
+        if (!res) allOk = false;
+      }
     }
+
+    Navigator.pop(context); // Tutup Loading
+    if (allOk) {
+      _showSnack("Tiket berhasil dipesan via $method!", Colors.green);
+      setState(() => _cart.clear());
+      buyerController.clear();
+    }
+  }
+
+  void _showSnack(String msg, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg, style: const TextStyle(fontWeight: FontWeight.bold)),
+      backgroundColor: color,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: const EdgeInsets.all(20),
+    ));
   }
 }
