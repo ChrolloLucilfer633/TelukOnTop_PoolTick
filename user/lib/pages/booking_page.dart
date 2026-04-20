@@ -243,7 +243,7 @@ class _BookingPageState extends State<BookingPage> {
           child: Text("Total Bayar: Rp $totalPrice", 
             style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 16)),
         ),
-        _paymentTile(Icons.qr_code_2, "QRIS Fast Pay", "Scan & Bayar instan", () {
+        _paymentTile(Icons.qr_code_2, "QRIS", "All Payment", () {
           Navigator.pop(context);
           prosesBayar(ticket, "QRIS", qty);
         }),
