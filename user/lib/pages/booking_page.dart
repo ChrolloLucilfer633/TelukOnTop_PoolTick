@@ -80,7 +80,7 @@ class _BookingPageState extends State<BookingPage> {
         titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
         title: const Text(
           "Pesan Tiket",
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 22, letterSpacing: -0.5),
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 22, letterSpacing: -0.5, color: Colors.white,),
         ),
         background: Stack(
           children: [
@@ -239,7 +239,7 @@ class _BookingPageState extends State<BookingPage> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: textDark.withOpacity(0.9),
+          color: textDark.withOpacity(0.95),
           borderRadius: BorderRadius.circular(28),
           boxShadow: [BoxShadow(color: primaryBlue.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
         ),
@@ -298,16 +298,62 @@ class _BookingPageState extends State<BookingPage> {
             const SizedBox(height: 20),
             const Text("Pilih Metode Bayar", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
-            _methodTile(Icons.qr_code_scanner_rounded, "QRIS", "Instan & Otomatis", () => _showQRISDialog()),
+            _methodTile(Icons.qr_code_scanner_rounded, "QRIS", "All Payment", () => _showQRISDialog()),
             _methodTile(Icons.account_balance_rounded, "Transfer Bank", "BCA, Mandiri, BNI", () => _showBankSubSheet()),
-            _methodTile(Icons.wallet_rounded, "E-Wallet", "Dana, OVO, LinkAja", () => _showWalletSubSheet()),
+            _methodTile(Icons.account_balance_wallet_rounded, "E-Wallet", "Dana, OVO, LinkAja", () => _showWalletSubSheet()),
           ],
         ),
       ),
     );
   }
 
-  // DIALOG QRIS
+  void _showBankSubSheet() {
+    Navigator.pop(context); // Tutup menu utama
+    _showSubSheet("Pilih Bank", [
+      {"n": "BCA", "d": "Bank Central Asia", "i": Icons.account_balance},
+      {"n": "Mandiri", "d": "Bank Mandiri", "i": Icons.account_balance},
+      {"n": "BNI", "d": "Bank Negara Indonesia", "i": Icons.account_balance},
+      {"n": "BRI", "d": "Bank Rakyat Indonesia", "i": Icons.account_balance},
+    ]);
+  }
+
+  void _showWalletSubSheet() {
+    Navigator.pop(context); // Tutup menu utama
+    _showSubSheet("Pilih E-Wallet", [
+      {"n": "Dana", "d": "Dompet Digital DANA", "i": Icons.smartphone_rounded},
+      {"n": "OVO", "d": "OVO Cash", "i": Icons.smartphone_rounded},
+      {"n": "ShopeePay", "d": "ShopeePay Indonesia", "i": Icons.smartphone_rounded},
+      {"n": "LinkAja", "d": "LinkAja Digital", "i": Icons.smartphone_rounded},
+    ]);
+  }
+
+  void _showSubSheet(String title, List items) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () { Navigator.pop(context); _showMainPaymentSheet(); },
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                ),
+                Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 10),
+            ...items.map((i) => _subMethodTile(i['n'], i['d'], i['i'])).toList(),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showQRISDialog() {
     Navigator.pop(context);
     int total = _calculateTotal();
@@ -325,7 +371,7 @@ class _BookingPageState extends State<BookingPage> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(color: bgGray, borderRadius: BorderRadius.circular(20)),
-              child: Image.network("https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TIKETHUB-$total"),
+              child: Image.network("https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=POOLTICK-$total"),
             ),
             const SizedBox(height: 25),
             SizedBox(
@@ -340,42 +386,6 @@ class _BookingPageState extends State<BookingPage> {
                 child: const Text("SAYA SUDAH BAYAR", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showBankSubSheet() {
-    Navigator.pop(context);
-    _showSubSheet("Pilih Bank", [
-      {"n": "BCA", "d": "Bank Central Asia", "l": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Bank_Central_Asia.svg/1200px-Bank_Central_Asia.svg.png"},
-      {"n": "Mandiri", "d": "Bank Mandiri", "l": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Bank_Mandiri_logo_2016.svg/1200px-Bank_Mandiri_logo_2016.svg.png"},
-      {"n": "BNI", "d": "Bank Negara Indonesia", "l": "https://upload.wikimedia.org/wikipedia/id/thumb/5/55/BNI_logo.svg/1200px-BNI_logo.svg.png"},
-    ]);
-  }
-
-  void _showWalletSubSheet() {
-    Navigator.pop(context);
-    _showSubSheet("Pilih E-Wallet", [
-      {"n": "Dana", "d": "Dompet Digital DANA", "l": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Logo_dana_blue.svg/1200px-Logo_dana_blue.svg.png"},
-      {"n": "OVO", "d": "OVO Cash", "l": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Logo_ovo_purple.svg/1200px-Logo_ovo_purple.svg.png"},
-    ]);
-  }
-
-  void _showSubSheet(String title, List items) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            ...items.map((i) => _subMethodTile(i['n'], i['d'], i['l'])).toList(),
           ],
         ),
       ),
@@ -397,11 +407,16 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 
-  Widget _subMethodTile(String name, String detail, String logoUrl) {
+  Widget _subMethodTile(String name, String detail, IconData icon) {
     return ListTile(
-      leading: Image.network(logoUrl, width: 40, height: 25, fit: BoxFit.contain),
+      leading: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(color: primaryBlue.withOpacity(0.05), borderRadius: BorderRadius.circular(12)),
+        child: Icon(icon, color: primaryBlue, size: 22),
+      ),
       title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(detail, style: const TextStyle(fontSize: 12)),
+      trailing: const Icon(Icons.chevron_right_rounded, size: 18),
       onTap: () { Navigator.pop(context); _executePayment(name); },
     );
   }
@@ -419,7 +434,8 @@ class _BookingPageState extends State<BookingPage> {
 
     bool allOk = true;
     for (var id in _cart.keys) {
-      if (_cart[id]! > 0) {
+      int qty = _cart[id]!;
+      for (int i = 0; i < qty; i++) {
         bool res = await ApiService.beliTiket(id, buyerController.text);
         if (!res) allOk = false;
       }
@@ -430,6 +446,8 @@ class _BookingPageState extends State<BookingPage> {
       _showSnack("Tiket berhasil dipesan via $method!", Colors.green);
       setState(() => _cart.clear());
       buyerController.clear();
+    } else {
+      _showSnack("Beberapa tiket gagal dipesan.", Colors.red);
     }
   }
 
