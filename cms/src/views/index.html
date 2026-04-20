@@ -129,6 +129,11 @@
               </thead>
               <tbody id="data"></tbody>
             </table>
+            <div class="text-end mt-3">
+              <button onclick="beliSemua()" class="btn btn-success px-4 fw-bold">
+                Beli Semua Tiket
+              </button>
+            </div>
           </div>
         </div>
 
@@ -154,7 +159,13 @@
 const API_TICKETS = 'http://localhost:3000/tickets';
 const API_TRANSACTIONS = 'http://localhost:3000/transactions';
 
-const rupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+let qtyMap = {}; // simpan qty tiap tiket
+
+const rupiah = (num) => new Intl.NumberFormat('id-ID', {
+  style: 'currency',
+  currency: 'IDR',
+  minimumFractionDigits: 0
+}).format(num);
 
 function login() {
   const user = document.getElementById('username').value;
@@ -167,66 +178,82 @@ function login() {
 }
 
 async function loadData() {
-  try {
-    const [tickets, transactions] = await Promise.all([
-      fetch(API_TICKETS).then(r => r.json()),
-      fetch(API_TRANSACTIONS).then(r => r.json())
-    ]);
-    renderTickets(tickets);
-    renderTransactions(transactions);
-  } catch (err) { console.error("Error API"); }
+  const [tickets, transactions] = await Promise.all([
+    fetch(API_TICKETS).then(r => r.json()),
+    fetch(API_TRANSACTIONS).then(r => r.json())
+  ]);
+  renderTickets(tickets);
+  renderTransactions(transactions);
 }
 
+/* ========================= */
+/* 🔥 UPDATE DI SINI */
+/* ========================= */
 function renderTickets(tickets) {
   const dataEl = document.getElementById('data');
-  dataEl.innerHTML = tickets.map(i => `
+
+  dataEl.innerHTML = tickets.map(i => {
+    if (qtyMap[i.id] == null) qtyMap[i.id] = 0;
+
+    return `
     <tr>
       <td><span class="badge-id">#${i.id}</span></td>
       <td class="fw-bold">${i.name}</td>
       <td class="text-success fw-bold">${rupiah(i.price)}</td>
+
       <td class="text-end">
-        <button onclick="editTiket(${i.id}, '${i.name}', ${i.price})" class="btn btn-sm btn-outline-warning border-0"><i class="bi bi-pencil-square"></i></button>
-        <button onclick="beliTiket(${i.id})" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-bold"><i class="bi bi-cart-plus me-1"></i>Beli</button>
-        <button onclick="hapusTiket(${i.id})" class="btn btn-sm btn-outline-danger border-0"><i class="bi bi-trash"></i></button>
+        <!-- QTY -->
+        <div class="d-inline-flex align-items-center me-2">
+          <button onclick="changeQty(${i.id}, -1)" class="btn btn-sm btn-outline-secondary">-</button>
+          <span id="qty-${i.id}" class="mx-2 fw-bold">${qtyMap[i.id]}</span>
+          <button onclick="changeQty(${i.id}, 1)" class="btn btn-sm btn-outline-secondary">+</button>
+        </div>
+        <!-- EDIT -->
+        <button onclick="editTiket(${i.id}, '${i.name}', ${i.price})"
+          class="btn btn-sm btn-warning text-white rounded-pill px-3 fw-bold me-1">
+          Edit
+        </button>
+        <!-- HAPUS -->
+        <button onclick="hapusTiket(${i.id})"
+          class="btn btn-sm btn-outline-danger border-0">
+          <i class="bi bi-trash"></i>
+        </button>
+
       </td>
     </tr>
-  `).join('');
-}
-
-function renderTransactions(transactions) {
-  const trxEl = document.getElementById('transaksi');
-  let total = 0;
-  trxEl.innerHTML = transactions.map(i => {
-    total += i.price;
-    return `
-      <tr class="small">
-        <td class="text-muted">${i.id}</td>
-        <td class="fw-bold">${i.name}</td>
-        <td><span class="badge bg-light text-primary border">${i.ticket?.name || 'Tiket'}</span></td>
-        <td class="fw-bold text-dark">${rupiah(i.price)}</td>
-        <td class="text-muted">${i.createdAt ? new Date(i.createdAt).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-'}</td>
-        <td class="text-center"><button onclick="hapusTransaksi(${i.id})" class="btn btn-link text-danger p-0"><i class="bi bi-x-circle"></i></button></td>
-      </tr>`;
+    `;
   }).join('');
-  document.getElementById('total').innerText = rupiah(total);
-}
-
-async function submitTiket() {
-  const id = document.getElementById('editId').value;
-  const name = document.getElementById('name').value;
-  const price = parseInt(document.getElementById('price').value);
-  if(!name || !price) return alert("Lengkapi data!");
-  const method = id ? 'PATCH' : 'POST';
-  const url = id ? `${API_TICKETS}/${id}` : API_TICKETS;
-  await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify({name, price}) });
-  resetForm(); loadData();
 }
 
 function editTiket(id, name, price) {
   document.getElementById('editId').value = id;
   document.getElementById('name').value = name;
   document.getElementById('price').value = price;
-  window.scrollTo({top: 0, behavior: 'smooth'});
+
+  // biar scroll ke form
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function submitTiket() {
+  const id = document.getElementById('editId').value;
+  const name = document.getElementById('name').value;
+  const price = parseInt(document.getElementById('price').value);
+
+  if (!name || !price) return alert("Lengkapi data!");
+
+  const method = id ? 'PATCH' : 'POST';
+  const url = id 
+    ? `${API_TICKETS}/${id}` 
+    : API_TICKETS;
+
+  await fetch(url, {
+    method,
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ name, price })
+  });
+
+  resetForm();
+  loadData();
 }
 
 function resetForm() {
@@ -235,44 +262,109 @@ function resetForm() {
   document.getElementById('price').value = "";
 }
 
-async function beliTiket(id) {
+
+/*Untuk membeli semua*/
+async function beliSemua() {
   const buyer = document.getElementById('buyerName').value;
   if (!buyer) return alert("Isi NAMA PEMBELI dulu!");
-  const t = await fetch(`${API_TICKETS}/${id}`).then(r => r.json());
-  await fetch(API_TRANSACTIONS, {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ ticketId: t.id, name: buyer, price: t.price, createdAt: new Date().toISOString() })
-  });
+
+  const tickets = await fetch(API_TICKETS).then(r => r.json());
+
+  for (let t of tickets) {
+    const qty = qtyMap[t.id] || 0;
+
+    for (let i = 0; i < qty; i++) {
+      await fetch(API_TRANSACTIONS, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          ticketId: t.id,
+          name: buyer,
+          price: t.price,
+          createdAt: new Date().toISOString()
+        })
+      });
+    }
+
+    qtyMap[t.id] = 0; // reset
+  }
+
   document.getElementById('buyerName').value = "";
   loadData();
 }
 
-function hapusTiket(id) { if(confirm("Hapus tiket?")) fetch(`${API_TICKETS}/${id}`, {method:'DELETE'}).then(loadData); }
-function hapusTransaksi(id) { if(confirm("Batalkan?")) fetch(`${API_TRANSACTIONS}/${id}`, {method:'DELETE'}).then(loadData); }
 
-function filterTable(tableId, colIndex) {
-  let input = document.getElementById('searchTicket').value.toUpperCase();
-  let tr = document.getElementById(tableId).getElementsByTagName("tr");
-  for (let i = 0; i < tr.length; i++) {
-    let td = tr[i].getElementsByTagName("td")[colIndex];
-    if (td) {
-      let txtValue = td.textContent || td.innerText;
-      tr[i].style.display = txtValue.toUpperCase().indexOf(input) > -1 ? "" : "none";
-    }
-  }
+
+/* ========================= */
+/* QTY FUNCTION */
+/* ========================= */
+function changeQty(id, change) {
+  qtyMap[id] += change;
+  if (qtyMap[id] < 0) qtyMap[id] = 0;
+
+  document.getElementById(`qty-${id}`).innerText = qtyMap[id];
 }
 
-async function downloadExcel() {
-  const data = await fetch(API_TRANSACTIONS).then(r => r.json());
-  const today = new Date().toDateString();
-  const filtered = data.filter(i => new Date(i.createdAt).toDateString() === today);
-  if (!filtered.length) return alert("Tidak ada data hari ini!");
-  let csv = "ID,Pembeli,Tiket,Harga,Waktu\n";
-  filtered.forEach(i => { csv += `${i.id},${i.name},${i.ticket?.name || '-'},${i.price},${new Date(i.createdAt).toLocaleTimeString()}\n`; });
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = `Laporan_PoolTick.csv`; a.click();
+/* ========================= */
+/* 🔥 UPDATE BELI */
+/* ========================= */
+async function beliTiket(id) {
+  const buyer = document.getElementById('buyerName').value;
+  if (!buyer) return alert("Isi NAMA PEMBELI dulu!");
+
+  const t = await fetch(`${API_TICKETS}/${id}`).then(r => r.json());
+  const qty = qtyMap[id] || 1;
+
+  // kirim sebanyak qty
+  for (let i = 0; i < qty; i++) {
+    await fetch(API_TRANSACTIONS, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        ticketId: t.id,
+        name: buyer,
+        price: t.price,
+        createdAt: new Date().toISOString()
+      })
+    });
+  }
+
+  qtyMap[id] = 1; // reset qty
+  document.getElementById('buyerName').value = "";
+  loadData();
+}
+
+/* ========================= */
+/* SISANYA TETAP */
+/* ========================= */
+
+function renderTransactions(transactions) {
+  const trxEl = document.getElementById('transaksi');
+  let total = 0;
+
+  trxEl.innerHTML = transactions.map(i => {
+    total += i.price;
+    return `
+      <tr>
+        <td>${i.id}</td>
+        <td>${i.name}</td>
+        <td>${i.ticket?.name || '-'}</td>
+        <td>${rupiah(i.price)}</td>
+        <td>${new Date(i.createdAt).toLocaleTimeString()}</td>
+        <td><button onclick="hapusTransaksi(${i.id})">X</button></td>
+      </tr>
+    `;
+  }).join('');
+
+  document.getElementById('total').innerText = rupiah(total);
+}
+
+function hapusTiket(id) {
+  fetch(`${API_TICKETS}/${id}`, {method:'DELETE'}).then(loadData);
+}
+
+function hapusTransaksi(id) {
+  fetch(`${API_TRANSACTIONS}/${id}`, {method:'DELETE'}).then(loadData);
 }
 </script>
 
