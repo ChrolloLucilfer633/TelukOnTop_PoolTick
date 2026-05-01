@@ -28,30 +28,47 @@ async function beliSemua() {
 }
 
 // Menampilkan list transaksi di tab riwayat
-function renderTransactions(transactions, tickets) {
+function renderTransactions(transactions) {
   const trxEl = document.getElementById('transaksi');
   let total = 0;
-  
-  trxEl.innerHTML = transactions.slice().reverse().map(i => {
-    total += i.price;
-    const dataTiket = tickets.find(t => t.id == i.ticketId);
-    const namaTiket = dataTiket ? dataTiket.name : "Tiket dihapus";
 
+  // 🔥 GROUPING DATA
+  const grouped = {};
+
+  transactions.forEach(i => {
+    const key = i.name + '-' + (i.ticket?.name || '-');
+
+    if (!grouped[key]) {
+      grouped[key] = {
+        id: i.id,
+        name: i.name,
+        ticket: i.ticket?.name || '-',
+        qty: 0,
+        price: i.price,
+        createdAt: i.createdAt
+      };
+    }
+
+    grouped[key].qty += 1;
+    total += i.price;
+  });
+
+  // 🔥 RENDER HASIL GROUP
+  trxEl.innerHTML = Object.values(grouped).map(i => {
     return `
       <tr>
-        <td><small class="text-muted">#${i.id}</small></td>
-        <td class="fw-bold">${i.name}</td>
-        <td><span class="badge bg-light text-dark border">${namaTiket}</span></td>
-        <td class="text-primary fw-bold">${rupiah(i.price)}</td>
+        <td>${i.id}</td>
+        <td>${i.name}</td>
+        <td>${i.ticket} (${i.qty}x)</td>
+        <td>${rupiah(i.price * i.qty)}</td>
         <td>${new Date(i.createdAt).toLocaleTimeString()}</td>
-        <td class="text-center">
-            <button onclick="hapusTransaksi(${i.id})" class="btn btn-sm btn-link text-danger p-0">
-                <i class="bi bi-x-circle-fill fs-5"></i>
-            </button>
+        <td>
+          <button onclick="hapusTransaksi(${i.id})">X</button>
         </td>
-      </tr>`;
+      </tr>
+    `;
   }).join('');
-  
+
   document.getElementById('total').innerText = rupiah(total);
 }
 
