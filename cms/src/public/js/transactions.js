@@ -32,12 +32,10 @@ function renderTransactions(transactions) {
   const trxEl = document.getElementById('transaksi');
   let total = 0;
 
-  //GROUPING DATA
+  // 1. GROUPING DATA (Tetap sama kodenya)
   const grouped = {};
-
   transactions.forEach(i => {
     const key = i.name + '-' + (i.ticket?.name || '-');
-
     if (!grouped[key]) {
       grouped[key] = {
         id: i.id,
@@ -48,22 +46,31 @@ function renderTransactions(transactions) {
         createdAt: i.createdAt
       };
     }
-
     grouped[key].qty += 1;
     total += i.price;
   });
 
-  //RENDER HASIL GROUP
+  // 2. RENDER HASIL GROUP (INI YANG DIGANTI TAMPILANNYA)
   trxEl.innerHTML = Object.values(grouped).map(i => {
     return `
       <tr>
-        <td>${i.id}</td>
-        <td>${i.name}</td>
-        <td>${i.ticket} (${i.qty}x)</td>
-        <td>${rupiah(i.price * i.qty)}</td>
-        <td>${new Date(i.createdAt).toLocaleTimeString()}</td>
-        <td>
-          <button onclick="hapusTransaksi(${i.id})">X</button>
+        <!-- py-3 bikin baris lebih tinggi/besar, text-center bikin ke tengah -->
+        <td class="py-3 text-center"><span class="badge bg-light text-primary fw-bold p-2">#${i.id}</span></td>
+        
+        <td class="py-3 text-center fw-bold text-dark">${i.name}</td>
+        
+        <td class="py-3 text-center">
+          ${i.ticket} <span class="badge bg-secondary-subtle text-secondary small ms-1">${i.qty}x</span>
+        </td>
+        
+        <td class="py-3 text-center text-success fw-bold">${rupiah(i.price * i.qty)}</td>
+        
+        <td class="py-3 text-center text-muted small">${new Date(i.createdAt).toLocaleTimeString()}</td>
+        
+        <td class="py-3 text-center">
+          <button onclick="hapusTransaksi(${i.id})" class="btn btn-outline-danger btn-sm rounded-3 px-2">
+            <i class="bi bi-trash"></i>
+          </button>
         </td>
       </tr>
     `;

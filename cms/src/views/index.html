@@ -117,7 +117,12 @@
               <div class="table-responsive">
                 <table class="table table-hover align-middle">
                   <thead class="bg-light">
-                    <tr><th>ID</th><th>NAMA TIKET</th><th>HARGA</th><th class="text-center">KELOLA & BELI</th></tr>
+                    <tr class="text-uppercase small fw-bold text-center"> <!-- Tambah text-center -->
+                      <th class="py-3">ID</th> <!-- Tambah py-3 -->
+                      <th class="py-3">NAMA TIKET</th>
+                      <th class="py-3">HARGA</th>
+                      <th class="py-3">KELOLA & BELI</th>
+                    </tr>
                   </thead>
                   <tbody id="data"></tbody>
                 </table>
@@ -133,15 +138,22 @@
           <div class="tab-pane fade" id="tab-transaksi">
             <div class="table-container shadow-sm border-0">
               <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold m-0 text-dark">Log Transaksi</h5>
-                <button onclick="hapusSemuaTransaksi()" class="btn btn-outline-danger btn-sm rounded-pill fw-bold">
+                <h5 class="fw-bold m-0 text-primary">Log Transaksi</h5>
+                <button onclick="hapusSemuaTransaksi()" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">
                   <i class="bi bi-trash3-fill me-1"></i>Bersihkan Riwayat
                 </button>
               </div>
               <div class="table-responsive">
-                <table class="table table-striped align-middle">
-                  <thead class="table-dark">
-                    <tr><th>ID</th><th>PEMBELI</th><th>TIKET</th><th>NOMINAL</th><th>WAKTU</th><th class="text-center">AKSI</th></tr>
+                <table class="table table-hover align-middle">
+                  <thead class="bg-light">
+                    <tr class="text-uppercase small fw-bold text-center">
+                      <th class="py-3">ID</th>
+                      <th class="py-3">PEMBELI</th>
+                      <th class="py-3">TIKET</th>
+                      <th class="py-3">NOMINAL</th>
+                      <th class="py-3">WAKTU</th>
+                      <th class="py-3">AKSI</th>
+                    </tr>
                   </thead>
                   <tbody id="transaksi"></tbody>
                 </table>
