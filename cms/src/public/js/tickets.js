@@ -4,20 +4,18 @@ let qtyMap = {};
 // Menampilkan data tiket ke dalam tabel HTML
 function renderTickets(tickets) {
   const dataEl = document.getElementById('data');
-  dataEl.innerHTML = tickets.map(i => {
+    dataEl.innerHTML = tickets.map((i, index) => {
     if (qtyMap[i.id] == null) qtyMap[i.id] = 0;
+    
     return `
     <tr>
-      <!-- Tambah py-3 agar lebih besar dan text-center agar ke tengah -->
-      <td class="py-3 text-center"><span class="badge-id">#${i.id}</span></td>
-      
+      <td class="py-3 text-center"><span class="badge-id">${index + 1}</span></td>
       <td class="py-3 text-center fw-bold">${i.name}</td>
-      
       <td class="py-3 text-center text-success fw-bold">${rupiah(i.price)}</td>
-      
       <td class="py-3 text-center">
         <div class="d-flex align-items-center justify-content-center gap-2">
           <div class="qty-box">
+            <!-- PENTING: Bagian onclick TETAP pakai i.id (ID Asli Database) -->
             <button onclick="changeQty(${i.id}, -1)" class="btn-qty">-</button>
             <span id="qty-${i.id}" class="qty-val">${qtyMap[i.id]}</span>
             <button onclick="changeQty(${i.id}, 1)" class="btn-qty">+</button>
