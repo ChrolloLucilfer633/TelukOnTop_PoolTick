@@ -27,8 +27,8 @@ class _BookingPageState extends State<BookingPage> {
   void initState() {
     super.initState();
     // Cache future di initState demi performa (tidak re-fetch saat setState)
-    _futureTickets = ApiService.getTickets().then((value) => value as List<dynamic>);
-  }
+    _futureTickets = ApiService.getTickets().then((value) => value);  
+    }
 
   int _calculateTotal() {
     int total = 0;
