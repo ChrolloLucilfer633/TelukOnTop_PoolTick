@@ -81,6 +81,8 @@ class _BookingPageState extends State<BookingPage> {
       elevation: 0,
       stretch: true,
       backgroundColor: primaryBlue,
+      // TAMBAHAN: Memaksa semua icon bawaan AppBar (termasuk tombol Back) berwarna putih
+      iconTheme: const IconThemeData(color: Colors.white), 
       flexibleSpace: FlexibleSpaceBar(
         centerTitle: false,
         titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
@@ -110,9 +112,6 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 
-  // ==========================================
-  // PERUBAHAN TAHAP 2: Header, Input & List Baru
-  // ==========================================
   Widget _buildSectionHeader(String title, IconData icon) {
     return Row(
       children: [
@@ -190,39 +189,52 @@ class _BookingPageState extends State<BookingPage> {
       },
     );
   }
-  // ==========================================
 
+  // ==========================================
+  // PERUBAHAN TAHAP 3: Tampilan Cards, Floating Bar, & Logic Transaksi
+  // ==========================================
   Widget _buildModernTicketCard(Map t) {
     int id = t['id'];
     int qty = _cart[id] ?? 0;
     bool isSelected = qty > 0;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 250),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: surfaceWhite,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: isSelected ? primaryBlue.withOpacity(0.3) : Colors.transparent, width: 2),
+        borderRadius: BorderRadius.circular(20),
+        // Interaktivitas UI: Border tipis menyala biru ketika item dipilih
+        border: Border.all(color: isSelected ? accentBlue : Colors.grey.shade100, width: isSelected ? 1.5 : 1),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(isSelected ? 0.08 : 0.04), blurRadius: 15, offset: const Offset(0, 8)),
+          BoxShadow(
+            color: isSelected ? accentBlue.withOpacity(0.05) : const Color(0xFF1E293B).withOpacity(0.02), 
+            blurRadius: 12, 
+            offset: const Offset(0, 4)
+          ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            height: 60, width: 60,
-            decoration: BoxDecoration(color: primaryBlue.withOpacity(0.1), borderRadius: BorderRadius.circular(16)),
-            child: Icon(Icons.confirmation_num, color: primaryBlue, size: 28),
+            height: 52, width: 52,
+            decoration: BoxDecoration(
+              color: isSelected ? accentBlue.withOpacity(0.1) : bgGray, 
+              borderRadius: BorderRadius.circular(14)
+            ),
+            child: Icon(Icons.local_activity_outlined, color: isSelected ? accentBlue : textMuted, size: 24),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(t['name'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: textDark)),
+                Text(t['name'], style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: textDark)),
                 const SizedBox(height: 4),
-                Text("Rp ${t['price']}", style: const TextStyle(color: Colors.green, fontWeight: FontWeight.w700, fontSize: 15)),
+                Text(
+                  "Rp ${t['price']}", 
+                  style: TextStyle(color: accentBlue, fontWeight: FontWeight.w700, fontSize: 14)
+                ),
               ],
             ),
           ),
@@ -263,13 +275,15 @@ class _BookingPageState extends State<BookingPage> {
 
   Widget _buildAnimatedFloatingBar(int total) {
     return Positioned(
-      bottom: 20, left: 20, right: 20,
+      bottom: 24, left: 20, right: 20,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         decoration: BoxDecoration(
-          color: textDark.withOpacity(0.95),
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: [BoxShadow(color: primaryBlue.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
+          color: primaryBlue, 
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(color: primaryBlue.withOpacity(0.25), blurRadius: 25, offset: const Offset(0, 12))
+          ],
         ),
         child: Row(
           children: [
@@ -277,21 +291,28 @@ class _BookingPageState extends State<BookingPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("TOTAL HARGA", style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10, fontWeight: FontWeight.w900)),
-                Text("Rp $total", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                Text("TOTAL BAYAR", style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                const SizedBox(height: 2),
+                Text("Rp $total", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.5)),
               ],
             ),
             const Spacer(),
             ElevatedButton(
               onPressed: _startPayment,
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryBlue,
+                backgroundColor: accentBlue,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 elevation: 0,
               ),
-              child: const Text("Checkout", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              child: const Row(
+                children: [
+                  Text("Checkout", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                  SizedBox(width: 6),
+                  Icon(Icons.arrow_forward_rounded, size: 16),
+                ],
+              ),
             )
           ],
         ),
@@ -451,29 +472,31 @@ class _BookingPageState extends State<BookingPage> {
     showDialog(
       context: context, 
       barrierDismissible: false,
-      builder: (_) => Center(child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
-        child: const CircularProgressIndicator(),
-      ))
+      builder: (_) => const Center(child: CircularProgressIndicator())
     );
 
     bool allOk = true;
     for (var id in _cart.keys) {
       int qty = _cart[id]!;
+      if (qty <= 0) continue;
+      
       for (int i = 0; i < qty; i++) {
         bool res = await ApiService.beliTiket(id, buyerController.text);
-        if (!res) allOk = false;
+        if (!res) {
+          allOk = false;
+          break; // Pembatasan loop jika terjadi kegagalan sekuensial API
+        }
       }
     }
 
-    Navigator.pop(context);
+    if (!mounted) return;
+    Navigator.pop(context); // Tutup Loading
+
     if (allOk) {
-      _showSnack("Tiket berhasil dipesan via $method!", Colors.green);
-      setState(() => _cart.clear());
+      _showSnack("Transaksi Berhasil! Tiket Anda telah dipesan via $method.", Colors.green);      setState(() => _cart.clear());
       buyerController.clear();
     } else {
-      _showSnack("Beberapa tiket gagal dipesan.", Colors.red);
+      _showSnack("Mohon maaf, terjadi gangguan saat memesan sebagian tiket.", Colors.redAccent);
     }
   }
 
